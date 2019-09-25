@@ -5,7 +5,7 @@ This document is designed to help the user run the Grotto pipeline with test dat
 ## Starting the Docker containers
 
 ```bash
-cd ~/git/ergatis-docker-recipes
+cd ~/git/rnaseq-docker
 sh launch_rnaseq.sh -i ~/grotto_test_data
 ```
 
@@ -51,6 +51,6 @@ On this page, verify everything looks correct, and click Next
 
 ## Shutting down the Grotto services
 ```bash
-cd ~/git/ergatis-docker-recipes
+cd ~/git/rnaseq-docker
 docker-compose down -v
 ```

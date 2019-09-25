@@ -63,7 +63,7 @@ In order to create additional pipelines in Grotto, the user must click the "Grot
 When you have finished your pipelines, you can shut down the containers with the following commands:
 
 ```
-cd ~/git/ergatis-docker-recipes/rnaseq
+cd ~/git/rnaseq-docker
 docker-compose -f docker_templates/docker-compose.yml down -v
 ```
 
