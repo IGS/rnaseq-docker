@@ -11,14 +11,12 @@ The next step would be to clone this git repository into the EC2 instance.  You 
 
 ```
 mkdir git; cd git
-git clone https://github.com/adkinsrs/ergatis-docker-recipes.git
-cd ergatis-docker-recipes
+git clone https://github.com/IGS/rnaseq-docker.git
+cd rnaseq-docker
 ```
 
-Within the 'ergatis-docker-recipes', the only directory that is of importance is the 'rnaseq' directory.
-
 ### Setting up the input and output areas
-Next create an input area to copy input files over to. This will take advantage of the attached volume from earlier (which should be mounted to /opt).  In addition, an output area directory will be created so that the pipeline "output_repository" directory can mount here, making results easily accessible
+Next create an input area to copy input files over to. This will take advantage of the attached volume from earlier (which should be mounted to /opt).  In addition, an output area directory will be created so that the pipeline "output\_repository" directory can mount here, making results easily accessible
 
 ```
 mkdir /opt/input_data
@@ -41,20 +39,20 @@ Now it's time to start the Grotto and RNAseq Docker containers.  The following s
 NOTE: for the -i and the -o options, make sure to specify the FULL PATH
 
 ```
-cd ~/git/ergatis-docker-recipes/rnaseq
+cd ~/git/rnaseq_docker
 sh launch_rnaseq.sh -i /opt/input_data -o /opt/output_repository -p "<EC2_IP>"
 ```
 
-The first time that launch_rnaseq.sh is run should take a few minutes, as Docker needs to pull the images down the Dockerhub repository.  Subsequent executions of the command should be much quicker.
+The first time that launch\_rnaseq.sh is run should take a few minutes, as Docker needs to pull the images down the Dockerhub repository.  Subsequent executions of the command should be much quicker.
 
 Next, in your web browser, navigate to <EC2_IP>:5000 to bring up the Grotto UI.  Follow the instructions to set up your pipeline noting the key differences.
-* When filling out the text fields, you will need to point to the /mnt/input_data location of the file, as that will be the location of the file within the "ergatis" Docker container.  So if your file on the EC2 container is /opt/input_data/test.fsa, then it will need to filled in as /mnt/input_data/test.fsa
-* Uploaded files, such as the "sample info file", should have their FASTQ paths pointing to /mnt/input_data as well.
+* When filling out the text fields, you will need to point to the /mnt/input\_data location of the file, as that will be the location of the file within the "ergatis" Docker container.  So if your file on the EC2 container is /opt/input\_data/test.fsa, then it will need to filled in as /mnt/input\_data/test.fsa
+* Uploaded files, such as the "sample info file", should have their FASTQ paths pointing to /mnt/input\_data as well.
 * On the 'Pipeline Options' page, the repository root needs to point to /opt/projects/rnaseq as this is where it is in the RNASeq docker image.  This should be pointed there by default.
 
 After the pipeline is made, the "Pipeline Status" page should appear.  This page, has a "Refresh" button that can be hit to get the current status of the pipeline and its components.  There is also a "View Pipeline" link that will take the user to the pipeline in Ergatis.  When the pipeline is first created, it does not run automatically, so the user needs to first click "View Pipeline" to bring the pipeline up in Ergatis, and then hit the "Rerun" button to start it.
 
-Pipeline output should be written to /opt/output_repository.
+Pipeline output should be written to /opt/output\_repository.
 
 ### Starting additional pipelines
 
@@ -69,14 +67,14 @@ cd ~/git/ergatis-docker-recipes/rnaseq
 docker-compose -f docker_templates/docker-compose.yml down -v
 ```
 
-Note that this will remove all the pipeline data that was created within the containers, so be sure to migrate the data you want before running these commands.  If you do not want the volume storing the pipeline output to be destroyed, remove the "-v" option from the docker-compose command.  However, do note that specifying this directory as the output source upon running "launch_rnaseq.sh" for a second time can cause problems, such as overwriting of existing output files.
+Note that this will remove all the pipeline data that was created within the containers, so be sure to migrate the data you want before running these commands.  If you do not want the volume storing the pipeline output to be destroyed, remove the "-v" option from the docker-compose command.  However, do note that specifying this directory as the output source upon running "launch\_rnaseq.sh" for a second time can cause problems, such as overwriting of existing output files.
 
 ## To use more than 4 processes in a pipeline
 
 Currently the "rnaseq" pipeline will only utilize 4 processors, since the Docker image was built to do that.  However, if your Amazon EC2 instance has more than 4 processes and you wish to utilize them, do the following.
 
 ```
-cd ~/git/ergatis-docker-recipes/rnaseq
+cd ~/git/rnaseq-docker
 docker build --no-cache -t adkinsrs/rnaseq .
 ```
 

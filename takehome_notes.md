@@ -17,14 +17,13 @@ Also it is worth noting that Grotto has only been tested in the Mac and Linux OS
 
 ## Getting the RNAseq GitHub repository
 
-The first step is to use 'git' to clone the "ergatis-docker-recipes" GitHub repository, which houses information and scripts for the "rnaseq" Docker image.  For this example, the following will take place in the user's home directory
+The first step is to use 'git' to clone the "rnaseq-docker" GitHub repository, which houses information and scripts for the "rnaseq" Docker image.  For this example, the following will take place in the user's home directory
 
 ```bash
 cd ~
 mkdir git; cd git
-git clone https://github.com/adkinsrs/ergatis-docker-recipes.git
-cd ergatis-docker-recipes
-git checkout rnaseq
+git clone https://github.com/IGS/rnaseq-docker.git
+cd rnaseq-docker
 ```
 
 ### Setting up the input area
@@ -48,7 +47,7 @@ NOTE: for the -i option, it is recommended to specify the full (absolute) path t
 NOTE: Before doing this step, make sure no other services are bound to ports 5000 or 8080 on your computer.  If other Docker containers are services are using those ports, either the Grotto site or the Ergatis site will not work.
 
 ```bash
-cd ~/git/ergatis-docker-recipes
+cd ~/git/rnaseq-docker
 sh launch_rnaseq.sh -i ~/input_data
 ```
 
@@ -97,6 +96,6 @@ When either the "Create BDBag" or "Generate Report" steps finish and a BDBag zip
 When you have finished your pipelines, you can shut down the containers with the following commands:
 
 ```bash
-cd ~/git/ergatis-docker-recipes
+cd ~/git/rnaseq-docker
 docker-compose down -v
 ```
