@@ -21,6 +21,8 @@ Various transcriptomics datasets can be computationally intensive, meaning there
 
 The choice in starting dataset can also result in large intermediate files that may use up most, if not all, of the storage space either allocated for Docker or for your computer.  You can run `docker system df -v` to view the amount of storage that Docker is using.  If you are running Docker on a Mac, you can change the percent of total system storage that Docker can utilize by following the steps in this link (https://docs.docker.com/docker-for-mac/space/)
 
+Remember, Docker allows for applications to be run anywhere that you can deploy Docker, but you have to use your own discretion regarding if your dataset(s) can actually be analyzed on your machine.
+
 ## Getting the RNAseq GitHub repository
 
 The first step is to use 'git' to clone the "rnaseq-docker" GitHub repository, which houses information and scripts for the "rnaseq" Docker image.  For this example, the following will take place in the user's home directory, but the `git clone` command can be run in any directory, so long as you modify the directory paths for any future instructions to account for this.
