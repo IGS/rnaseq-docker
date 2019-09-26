@@ -1,6 +1,6 @@
-# Grotto Transcriptomics Pipeline Takehome Notes
+# Transcriptomics Pipeline README
 
-This document expands on the Grotto workshop notes, and walks you through how to use Grotto on your personal computer.  
+This document aims to help you download Grotto and the RNASeq pipeline, and walks you through how to use Grotto on your personal computer.  
 
 Keep in mind that this interface has only recently been developed and is still under active development.  If you have any questions, comments, or suggestions feel free to send an e-mail to Shaun Adkins (sadkins@som.umaryland.edu)
 
@@ -15,9 +15,15 @@ The following tools are required in order to run Grotto;
 
 Also it is worth noting that Grotto has only been tested in the Mac and Linux OS environments.  It may not work on a Windows environment.
 
+### Special Note
+
+Various transcriptomics datasets can be computationally intensive, meaning there is a possibility of running out of RAM to complete one or more intermediate tasks.  You can run `docker stats` to view resource usage in a live stream and `docker stats --no-stream` to view a snapshot of the resource usage.
+
+The choice in starting dataset can also result in large intermediate files that may use up most, if not all, of the storage space either allocated for Docker or for your computer.  You can run `docker system df -v` to view the amount of storage that Docker is using.  If you are running Docker on a Mac, you can change the percent of total system storage that Docker can utilize by following the steps in this link (https://docs.docker.com/docker-for-mac/space/)
+
 ## Getting the RNAseq GitHub repository
 
-The first step is to use 'git' to clone the "rnaseq-docker" GitHub repository, which houses information and scripts for the "rnaseq" Docker image.  For this example, the following will take place in the user's home directory
+The first step is to use 'git' to clone the "rnaseq-docker" GitHub repository, which houses information and scripts for the "rnaseq" Docker image.  For this example, the following will take place in the user's home directory, but the `git clone` command can be run in any directory, so long as you modify the directory paths for any future instructions to account for this.
 
 ```bash
 cd ~
@@ -51,7 +57,7 @@ cd ~/git/rnaseq-docker
 sh launch_rnaseq.sh -i ~/input_data
 ```
 
-The first time that launch\_rnaseq.sh is run should take a few minutes, as Docker needs to pull the images down the Dockerhub repository.  Subsequent executions of the command should be much quicker.
+The first time that launch\_rnaseq.sh is run should take a few minutes, as Docker needs to pull the various images down the Dockerhub repository.  Subsequent executions of the command should be much quicker.
 
 Next, in your web browser, navigate to *localhost:5000* to bring up the Grotto UI.
 
