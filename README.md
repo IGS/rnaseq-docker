@@ -4,6 +4,10 @@ This document aims to help you download Grotto and the RNASeq pipeline, and walk
 
 Keep in mind that this interface has only recently been developed and is still under active development.  If you have any questions, comments, or suggestions feel free to send an e-mail to Shaun Adkins (sadkins@som.umaryland.edu)
 
+If you use Grotto in published research, please cite:
+
+> Shetty, A.C., Adkins, R.S., Chatterjee, A., McCracken, C.L., Hodges, T., Creasy, H.H., Giglio, M., Mahurkar, A. and White, O. 2019. CAVERN: Computational and visualization environment for RNA-seq analyses. Presented at the 69th Annual Meeting of the American Society of Human Genetics, Houston, Texas.
+
 ## Requirements
 
 The following tools are required in order to run Grotto;
