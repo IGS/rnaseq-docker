@@ -2,12 +2,9 @@ version: '3'
 
 networks:
   ergatis:
-  rabbitmq:
 
 volumes:
-  bdbag_out_vol:
   projects_vol:
-  reports_out_vol:
   scratch_vol:
 
 services:
@@ -44,65 +41,16 @@ services:
       - scratch_vol:/usr/local/scratch
       - ###INPUT_SOURCE###:/mnt/input_data
 
-  bdbag:
-    command: ["/opt/wait/wait-for-it.sh", "rabbit:5672", "--", "/usr/bin/perl", "/opt/bdbag_listener.pl"]
-    depends_on:
-      - rabbit
-    environment:
-      - AMQP_ADDRESS=rabbit
-    image: apaala/bdbag_rabbit:1.1a
-    networks:
-      - rabbitmq
-    restart: always
-    tty: true
-    volumes:
-      - ./utils:/opt/wait:z
-      - bdbag_out_vol:/tmp/bdbag/:z
-      - projects_vol:/opt/projects/repository
-      - reports_out_vol:/tmp/reports/:z
-
 # Container with the pipeline configuration UI 
   grotto:
-    depends_on:
-      - rabbit
     environment:
       - DOCKER_HOST=###IP_HOST###
-      - AMQP_ADDRESS=rabbit
-      - PERL5LIB=/opt/ergatis/lib/perl5
-    image: adkinsrs/grotto:latest
+    image: adkinsrs/grotto:devel
     networks:
       - ergatis
-      - rabbitmq
     ports:
       - "5000:5000"
     volumes:
       - projects_vol:/opt/projects/repository
       - scratch_vol:/usr/local/scratch
       - ###INPUT_SOURCE###:/mnt/input_data
-      - bdbag_out_vol:/tmp/bdbag/
-      - reports_out_vol:/tmp/reports/
-
-  rabbit:
-    image: rabbitmq:3-alpine
-    networks:
-      - rabbitmq
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-
-  reports:
-    command: ["/opt/wait/wait-for-it.sh", "rabbit:5672", "--", "/usr/bin/perl", "/opt/make_report_listener.pl"]
-    depends_on:
-      - rabbit
-    environment:
-      - AMQP_ADDRESS=rabbit
-    image: apaala/report_rabbit:1.1b
-    networks:
-      - rabbitmq
-    restart: always
-    tty: true
-    volumes:
-      - ./utils:/opt/wait:Z
-      - bdbag_out_vol:/tmp/bdbag/:z
-      - projects_vol:/opt/projects/repository
-      - reports_out_vol:/tmp/reports/:z

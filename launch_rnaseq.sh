@@ -3,41 +3,17 @@
 function print_usage {
     progname=`basename $0`
     cat << END
-usage: $progname -i </path/to/input/dir> -p <HOST_IP>
+usage: $progname -i </path/to/input/directory>
 END
     exit 1
 }
 
-# Resolve relative directory path
-function abspath {
-    if [[ -d "$1" ]]
-    then
-        pushd "$1" >/dev/null
-        pwd
-        popd >/dev/null
-    else
-        if [[ -e $1 ]]
-        then
-            echo "$1" needs to be a directory! >&2
-        else
-            echo "$1" does not exist! >&2
-        fi
-        exit 127
-    fi
-}
-
-while getopts "i:p:" opt
+while getopts "i:" opt
 do
     case $opt in
         i) input_source=$OPTARG;;
-        p) ip_host=$OPTARG;;
     esac
 done
-
-if [ -z "$ip_host" ]; then
-    echo "Setting IP to 'localhost'"
-    ip_host="localhost"
-fi
 
 if [ -z "$input_source" ]; then
     echo "Must provide 'input_source' option."
@@ -61,9 +37,16 @@ docker_compose_tmpl=${DIR}/docker_templates/docker-compose.yml.tmpl
 docker_compose=${DIR}/docker-compose.yml
 cp $docker_compose_tmpl $docker_compose
 
-abs_input_source=$(abspath $input_source)
+# Create the docker-machine.  This assumes the user has AWS credentials at $HOME/.aws/credentials
+`docker-machine create --driver amazonec2 --amazonec2-open-port 5000 --amazonec2-open-port 8080 aws-grotto`
+# Source environment variables
+`eval $(docker-machine env aws-grotto)`
+# Copy input source data to the EC2 instance
+`docker-machine scp -r $input_source aws-sandbox:/home/ubuntu/`
 
-perl -i -pe "s|###INPUT_SOURCE###|$abs_input_source|" $docker_compose
+ip_host=$(docker-machine ip aws_grotto)
+
+perl -i -pe "s|###INPUT_SOURCE###|/home/ubuntu|" $docker_compose
 perl -i -pe "s|###IP_HOST###|$ip_host|" $docker_compose
 
 # Remove leftover template ### lines from compose file
