@@ -54,8 +54,9 @@ Tutorial: <https://docs.docker.com/machine/examples/aws/>
   * The "-i" option is the location of your input data
   * This will launch a docker-machine (ec2-based) under the name "ec2\_grotto"
     * This step can take a bit of time to set up the machine
+    * Currently I have it set by default to a "t3.medium" instance type"
   * The output of the script will let you know the IP address that Grotto will launch in
-  * NOTE there is nothing in place to terminate this maching
+  * NOTE there is nothing in place to terminate this machine
 
 ## Things yet to do with the Grotto Docker stack
 
