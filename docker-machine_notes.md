@@ -4,6 +4,10 @@ This document is tracking the process of running GROTTO on Amazon EC2 using Dock
 
 Tutorial: <https://docs.docker.com/machine/examples/aws/>
 
+NOTE: If you want to just run Grotto...
+* Check out the 'Running Grotto' section
+* Check out the "Removing a Docker Machine" section to remove the AWS machine
+
 ## Setting up Docker Machine
 
 * To create the virtual machine:

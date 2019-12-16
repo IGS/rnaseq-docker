@@ -39,14 +39,17 @@ cp $docker_compose_tmpl $docker_compose
 
 # Create the docker-machine.  This assumes the user has AWS credentials at $HOME/.aws/credentials
 printf "Now creating 'aws-grotto' Docker machine...\n"
-$(docker-machine create --driver amazonec2 --amazonec2-instance-type t3.medium --amazonec2-ssh-keypath ~/.ssh/id_rsa --amazonec2-open-port 5000 --amazonec2-open-port 8080 aws-grotto)
+docker-machine create --driver amazonec2 --amazonec2-instance-type t3.medium  --amazonec2-open-port 5000 --amazonec2-open-port 8080 aws-grotto
+
+# This version of the command has --amazonec2-ssh-keypath set, but a user may not have the ~/.ssh/id_rsa file
+#$(docker-machine create --driver amazonec2 --amazonec2-instance-type t3.medium --amazonec2-ssh-keypath ~/.ssh/id_rsa --amazonec2-open-port 5000 --amazonec2-open-port 8080 aws-grotto)
 
 # Source environment variables
 eval $(docker-machine env aws-grotto)
 
 # Copy input source data to the EC2 instance
 printf "Now copying files to the machine\n"
-$(docker-machine scp -r $input_source aws-grotto:/home/ubuntu/input_data)
+docker-machine scp -r $input_source aws-grotto:/home/ubuntu/input_data
 
 ip_host=$(docker-machine ip aws-grotto)
 
