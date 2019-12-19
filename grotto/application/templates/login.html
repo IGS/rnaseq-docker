@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" type="text/css" href="/static/login.css">
+{% endblock %}
+
+{% block title %}Login{% endblock %}
+
+{% block body %}
+  <form name="input_file" id="input" action="{{ url_for('auth_bp.login') }}" method="post" class="input-parameters" enctype="multipart/form-data">
+    <div id="input-wrapper">
+        <div class="form-field">
+          <label for="username">Username</label>
+          <input type="text" name="username">
+        </div>
+        <div class="form-field">
+          <label for="password">Password</label>
+          <input type="password" name="password">
+        </div>
+    </div>
+    <button type="submit" name="Next">Login</button>
+  </form>
+
+  <a href="/static/GrottoSOP.pdf" download>Download Grotto SOP (beta)</a>
+{% endblock %}

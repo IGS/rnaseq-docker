@@ -1,0 +1,246 @@
+{% extends "layout.html" %}
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" type="text/css" href="/static/config_file_form.css">
+    <link rel="stylesheet" type="text/css" href="/static/submit.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="/static/js/submit.js"></script>
+    <script type=text/javascript>
+      $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    </script>
+{% endblock %}
+
+{% block title %}Summary{% endblock %}
+
+{% block body %}
+  <div class="submit-options">
+
+  <div class="acc-container">
+    <div class="acc-btn"><h3>Sample Info File</h3></div>
+      <div class="acc-content">
+        <div class="acc-content-inner">
+
+          {% for entry in session['sample_info_file']%}
+            <table class="tbl-wrapper" style="margin-bottom: 20px;">
+              <tr>
+                <td><u>Entry {{ entry['count'] }}</u></td>
+              </tr>
+              <tr>
+                <td>Sample ID</td>
+                <td><label name="input_r{{ entry['count'] }}_sample_id" class="value-label">{{ entry['sample_id'] }}</label></td>
+              </tr>
+              <tr>
+                <td>Group ID</td>
+                <td><label name="input_r{{ entry['count'] }}_group_id" class="value-label">{{ entry['group_id'] }}</label></td>
+              </tr>
+              <tr>
+                <td>File 1</td>
+                <td><label name="input_r{{ entry['count'] }}_file_1" class="value-label" style="width: 100%;">{{ entry['file_1'] }}</label></td>
+              </tr>
+              <tr>
+                <td>File 2</td>
+                <td><label name="input_r{{ entry['count'] }}_file_2" class="value-label" style="width: 100%;">{{ entry['file_2'] }}</label></td>
+              </tr>
+            </table>
+          {% endfor %}
+          <a href="/static/tmp/{{ session['file_base'] }}.temp.info" download="pipeline_sample.info" style="float:left;">Download File</a>
+          <a href="/sample_info_file">Edit</a>
+        </div>
+      </div>
+
+    <div class="acc-btn"><h3>Pipeline Options</h3></div>
+      <div class="acc-content">
+        <div class="acc-content-inner">
+          <table class="tbl-wrapper">
+            <tr>
+              <td style="width: 35%;"><label for="genome-analysis">Genome Analysis</label></td>
+              <td><label name="genome_analysis" id="genome-analysis" class="value-label">{{ session['pipeline_type'] }}</label></td>
+            </tr>
+            <tr>
+              <td><label for="reference">Reference</label></td>
+              <td><label name="reference" id="reference" class="value-label" style="margin: 0px; width: 100%;">{{ session['pipeline_options']['reference'] }}</label></td>
+            </tr>
+            <tr>
+              <td><label for="gtf">GTF</label></td>
+              <td><label name="gtf" id="gtf" class="value-label" style="margin: 0px; width: 100%;">{{ session['pipeline_options']['gtf'] }}</label></td>
+            </tr>
+            <tr>
+              <td><label for="repository-root">Repository Root</label></td>
+              <td><label name="repository_root" id="repository-root" class="value-label" style="margin: 0px; width: 100%;">{{ session['pipeline_options']['repository_root'] }}</label></td>
+            </tr>
+            <tr>
+              <td><label for="project-code">Project Code</label></td>
+              <td><label name="project_code" id="project-code" class="value-label" style="margin: 0px; width: 100%;">{{ session['pipeline_options']['project_code'] }}</label></td>
+            </tr>
+            <tr>
+              <td><label for="annotation-format">Annotation Format</label></td>
+              <td><label name="annotation_format" id="annotation-format" class="value-label">{{ session['pipeline_options']['annotation_format'] }}</label></td>
+            </tr>
+            <tr>
+              <td><label for="tophat-legacy">Use Tophat instead of HISAT2</label></td>
+              <td><label name="tophat_legacy" id="tophat-legacy" class="value-label">{{ session['pipeline_options']['tophat_legacy'] }}</label></td>
+            </tr>
+            <tr>
+              <td><label for="build-indexes">Build Indexes</label></td>
+              <td><label name="build_indexes" id="build-indexes" class="value-label">{{ session['pipeline_options']['build_indexes'] }}</label></td>
+            </tr>
+            <tr>
+              <td><label for="quality-stats">Quality Stats</label></td>
+              <td><label name="quality_stats" id="quality-stats" class="value-label">{{ session['pipeline_options']['quality_stats'] }}</label></td>
+            </tr>
+            <tr>
+              <td><label for="quality-trimming">Quality Trimming</label></td>
+              <td><label name="quality_trimming" id="quality-trimming" class="value-label">{{ session['pipeline_options']['quality_trimming'] }}</label></td>
+            </tr>
+
+            <tr>
+              <td><label for="alignment">Alignment</label></td>
+              <td><label name="alignment" id="alignment" class="value-label">{{ session['pipeline_options']['alignment'] }}</label></td>
+            </tr>
+            {% if session['pipeline_options']['alignment']=='on' and session['pipeline_options']['bowtie_build']=='off' %}
+              <tr>
+                <td><label for="bowtie-index-file" style="margin-left:30px;">Bowtie Index File</label></td>
+                <td><label name="bowtie_index_file" id="bowtie-index-file" class="value-label">{{ session['pipeline_options']['bowtie_index_file'] }}</label></td>
+              </tr>
+            {% endif %}
+
+            <tr>
+              <td><label for="visualization">Visualization</label></td>
+              <td><label name="visualization" id="visualization" class="value-label">{{ session['pipeline_options']['visualization'] }}</label></td>
+            </tr>
+            {% if session['pipeline_options']['visualization']=='on' and session['pipeline_options']['alignment']=='off' %}
+              <tr>
+                <td><label for="file-type" style="margin-left:30px;">File Type</label></td>
+                <td><label name="file_type" id="file-type" class="value-label">{{ session['pipeline_options']['file_type'] }}</label></td>
+              </tr>
+              <tr>
+                <td><label for="sorted" style="margin-left:30px;">Sorted</label></td>
+                <td><label name="sorted" id="sorted" class="value-label">{{ session['pipeline_options']['sorted'] }}</label></td>
+              </tr>
+            {% endif %}
+
+            <tr>
+              <td><label for="rpkm-analysis">RPKM Analysis</label></td>
+              <td><label name="rpkm_analysis" id="rpkm-analysis" class="value-label">{{ session['pipeline_options']['rpkm_analysis'] }}</label></td>
+            </tr>
+            {% if session['pipeline_options']['rpkm_analysis']=='on' and session['pipeline_options']['alignment']=='off' %}
+              <tr>
+                <td><label for="file-type" style="margin-left:30px;">File Type</label></td>
+                <td><label name="file_type" id="file-type" class="value-label">{{ session['pipeline_options']['file_type'] }}</label></td>
+              </tr>
+              <tr>
+                <td><label for="sorted" style="margin-left:30px;">Sorted</label></td>
+                <td><label name="sorted" id="sorted" class="value-label">{{ session['pipeline_options']['sorted'] }}</label></td>
+              </tr>
+            {% endif %}
+
+            <tr>
+              <td><label for="differential-gene-expression">Differential Gene Expression</label></td>
+              <td><label name="differential_gene_expression" id="differential-gene-expression" class="value-label">{{ session['pipeline_options']['differential_gene_expression'] }}</label></td>
+            </tr>
+            {% if session['pipeline_options']['differential_gene_expression']=='on' %}
+              {% if session['pipeline_options']['alignment']=='off' %}
+                <tr>
+                  <td><label for="file-type" style="margin-left:30px;">File Type</label></td>
+                  <td><label name="file_type" id="file-type" class="value-label">{{ session['pipeline_options']['file_type'] }}</label></td>
+                </tr>
+                <tr>
+                  <td><label for="sorted" style="margin-left:30px;">Sorted</label></td>
+                  <td><label name="sorted" id="sorted" class="value-label">{{ session['pipeline_options']['sorted'] }}</label></td>
+                </tr>
+              {% endif %}
+              <tr>
+                <td><label for="count" style="margin-left:30px;">Count</label></td>
+                <td><label name="count" id="count" class="value-label">{{ session['pipeline_options']['count'] }}</label></td>
+              </tr>
+              <tr>
+                <td><label for="comparison-groups1" style="margin-left:30px;">Comparison Groups</label></td>
+                <td><label name="comparison_groups1" id="comparison-groups1" class="value-label">{{ session['pipeline_options']['comparison_groups'] }}</label></td>
+              </tr>
+            {% endif %}
+
+            {% if session['pipeline_type'] == 'Eukaryotic' %}
+            <tr>
+              <td><label for="isoform-analysis">Isoform Analysis</label></td>
+              <td><label name="isoform_analysis" id="isoform-analysis" class="value-label">{{ session['pipeline_options']['isoform_analysis'] }}</label></td>
+            </tr>
+            {% if session['pipeline_options']['isoform_analysis']=='on' %}
+              {% if session['pipeline_options']['alignment']=='off' %}
+                <tr>
+                  <td><label for="file-type" style="margin-left:30px;">File Type</label></td>
+                  <td><label name="file_type" id="file-type" class="value-label">{{ session['pipeline_options']['file_type'] }}</label></td>
+                </tr>
+                <tr>
+                  <td><label for="sorted" style="margin-left:30px;">Sorted</label></td>
+                  <td><label name="sorted" id="sorted" class="value-label">{{ session['pipeline_options']['sorted'] }}</label></td>
+                </tr>
+              {% endif %}
+              <tr>
+                <td><label for="include-novel" style="margin-left:30px;">Include Novel</label></td>
+                <td><label name="include_novel" id="include-novel" class="value-label">{{ session['pipeline_options']['include_novel'] }}</label></td>
+              </tr>
+            {% endif %}
+
+            <tr>
+              <td><label for="differential-isoform-analysis">Differential Isoform Analysis</label></td>
+              <td><label name="differential_isoform_analysis" id="differential-isoform-analysis" class="value-label">{{ session['pipeline_options']['differential_isoform_analysis'] }}</label></td>
+            </tr>
+            {% if session['pipeline_options']['differential_isoform_analysis']=='on' %}
+              {% if session['pipeline_options']['alignment']=='off' %}
+                <tr>
+                  <td><label for="file-type" style="margin-left:30px;">File Type</label></td>
+                  <td><label name="file_type" id="file-type" class="value-label">{{ session['pipeline_options']['file_type'] }}</label></td>
+                </tr>
+                <tr>
+                  <td><label for="sorted" style="margin-left:30px;">Sorted</label></td>
+                  <td><label name="sorted" id="sorted" class="value-label">{{ session['pipeline_options']['sorted'] }}</label></td>
+                </tr>
+              {% endif %}
+              <tr>
+                <td><label for="comparison-groups2" style="margin-left:30px;">Comparison Groups</label></td>
+                <td><label name="comparison_groups2" id="comparison-groups2" class="value-label">{{ session['pipeline_options']['comparison_groups'] }}</label></td>
+              </tr>
+              <tr>
+                <td><label for="include-novel" style="margin-left:30px;">Use reference GTF/GFF3 in Cuffdiff</label></td>
+                <td><label name="include_novel" id="include-novel" class="value-label">{{ session['pipeline_options']['use_ref_gtf'] }}</label></td>
+              </tr>
+            {% endif %}
+            <tr>
+              <td><label for="cuff-legacy" style="margin-left:30px;">Use older Cuffsuite</label></td>
+              <td><label name="cuff_legacy" id="cuff-legacy" class="value-label">{{ session['pipeline_options']['cufflinks_legacy'] }}</label></td>
+            </tr>
+            {% endif %} <!--End of if pipeline_type=Eukaryotic-->
+
+          </table>
+          <a href="/static/tmp/{{ session['file_base'] }}.pipeline_options.txt" download style="float:left;">Download File</a>
+          <a href="/pipeline_options">Edit</a>
+        </div>
+      </div>
+
+      <div class="acc-btn"><h3>Configuration File Form</h3></div>
+        <div class="acc-content">
+          <div class="acc-content-inner">
+            {% for component in result %}
+            <h3>{{ result[component]['0']['title'] }}</h3>
+            <table class="tbl-wrapper">
+              {% for i in range(0,result[component]|length) %}
+              <tr>
+                <td style="width:400px;"><label for="{{ result[component][i|string]['key'] }}">{{ result[component][i|string]['key'] }}</label></td>
+                <td><label name="{{ component }}_{{ result[component][i|string]['key'] }}" class="value-label">{{ result[component][i|string]['value'] }}</label></td>
+              </tr>
+              {% endfor %}
+            </table>
+            {% endfor %}
+          <a href="/static/tmp/{{ session['file_base'] }}.temp.config" download="pipeline_sample.config" style="float:left;">Download File</a>
+          <a href="/config_file_form">Edit</a>
+        </div>
+      </div>
+
+    </div><!-- end acc-container -->
+
+    <form name="submit_data" action="{{ url_for('main_bp.submit') }}" method="post">
+      <button type="submit" name="Submit">Submit</button>
+    </form>
+
+  </div><!--submit options -->
+{% endblock %}

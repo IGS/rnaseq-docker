@@ -1,0 +1,243 @@
+@charset "UTF-8";
+/* CSS Document */
+
+/* divs */
+
+html {
+	height: 100%;
+	box-sizing: border-box; /* box width is based on content, padding, and border */
+	-webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+body {
+	background-color: #EDF3FA;
+	background-repeat: repeat-x;
+	margin: 0;
+	height:100%;
+	overflow: scroll;
+}
+
+/* FOOTER STUFF */
+footer {
+	background-color: #383838;
+	min-height: 100px;
+	display: block;
+	clear: both
+}
+
+#footer-text{
+	color: #fff;
+	font-family: 'montserratlight';
+	font-size: 12px;
+	display: inline-block;
+	margin: 45px 0px 0px 200px;
+}
+
+#footer-logo{
+	float: right;
+	margin: 12px 220px 0px 0px;
+}
+
+/* HEADER STUFF */
+header {
+	/*height: 135px;*/
+	/*padding-top: 30px;*/
+	display: block;
+	background-image: url("header-bg.png");
+	background-repeat: no-repeat;
+	background-size: cover;
+	min-height: 100px;
+}
+
+#grotto-logo {
+	display: block;
+	padding-top: 20px;
+	margin-left: 35px;
+	max-width: 25%;
+}
+
+/* MAIN CONTENT */
+.body-wrapper {
+	display: block;
+	font-family: 'montserratlight';
+  padding: 35px;
+  min-height: 100%;
+}
+
+.body-title {
+	display: inline-block;
+	width: 100%;
+}
+
+.submit-form {
+	width: 550px;
+	border: 1px solid black;
+}
+
+.body-left {
+	display: inline-block;
+	width: 40%;
+	vertical-align: top;
+}
+
+.body-msgs {
+	display: inline-block;
+	float: none;
+	vertical-align: top;
+}
+
+.body-right {
+	/*display: inline-block;*/
+	float: right;
+	vertical-align: top;
+	width: 50%;
+}
+
+.flash-error {
+	color : red;
+}
+
+.flash-success {
+	color : green;
+}
+
+input:focus {
+  outline: medium none;
+}
+
+main {
+	width: 100%;
+}
+
+/* text styling */
+
+.user-nav {
+	color: #096592;
+	float: right;
+	margin: 0px 10px 0px 0px;
+}
+
+.user-nav a {
+	padding-right: 20px;
+}
+
+.user-nav span {
+	padding-right: 20px;
+	margin: 0px;
+}
+
+h1 {
+	color: #515151;
+	font-size: 24px;
+	float: left;
+	margin: 0;
+}
+
+h2 {
+	color: #515151;
+}
+
+a {
+	color: #096592;
+	text-decoration: none;
+}
+
+a .link-right {
+  float: right;
+}
+
+a:hover {
+	color: #347779;
+}
+
+.logged-in {
+	font-family: 'Roboto_light', Helvetica, sans-serif;
+	color: #fff;
+}
+
+.name {
+	font-family: 'Roboto_bold', Helvetica, sans-serif;
+}
+
+.linkto {
+	padding-left: 20px;
+}
+
+.input-parameters {
+	border: 1px solid #c5c7cb;
+  border-radius: 5px;
+	padding: 20px;
+	font-size: 18px;
+	display: inline-block;
+	background-color: #ffffff;
+	margin-top: 15px;
+	width: 100%;
+}
+
+.input-parameters label {
+	color: #515151;
+}
+
+.input-parameters input, textarea {
+  padding: 5px;
+  font-size: 18px;
+  border: 1px solid #c5c7cb;
+  border-radius: 5px;
+  background-color: #f2f7ff;
+  color: #908e8e;
+  /*width: 275px;*/
+  margin-bottom: 10px;
+}
+
+.input-parameters button {
+	font-size: 18px;
+	background-color: #096592;
+	width: 175px;
+	height: 35px;
+	color: #ffffff;
+	/*margin: 30px 30px 30px 0;*/
+	border: 0;
+	cursor: pointer;
+	float: right;
+	border-radius: 30px;
+}
+
+.input-parameters button:hover {
+	background-color: #00A99D;
+}
+
+/* Tooltip container */
+.tooltip {
+    position: relative;
+		/*display: inline-block;*/
+		float: right;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 290px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    border-radius: 6px;
+
+    /* Position the tooltip text */
+    position: absolute;
+    z-index: 1;
+    top: -14px;
+    left: 135%;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}

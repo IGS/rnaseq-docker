@@ -1,0 +1,95 @@
+/* CSS Document */
+
+button.circle {
+  border-radius: 50%;
+  width: 0px;
+  height: 0px;
+  position: relative;
+  padding: 0;
+  margin: auto;
+}
+
+#add-new {
+  /* lining up with other buttons */
+  float: right;
+	cursor: pointer;
+}
+
+.upload {
+  width:100%;
+  margin-bottom: 60px;
+}
+
+.upload input {
+  width: 50%
+}
+
+.upload button {
+  margin: auto;
+}
+
+.input-parameters input {
+  background-color: lightyellow;
+}
+
+/* File upload section */
+.upload-label {
+  display: inline-block;
+  width: 15%;
+}
+
+.tooltip {
+  width:5%;
+  float: none;
+}
+
+/* Sample table, as divs */
+#row-headers{
+  margin-bottom:10px;
+}
+
+.tbl-wrapper{
+  width: 100%;
+}
+
+.td-number {
+  display:inline-block;
+  width:5%;
+}
+
+.td-sample {
+  display:inline-block;
+  width:20%;
+}
+
+.td-group {
+  display:inline-block;
+  width:20%;
+}
+
+.td-file1 {
+  display:inline-block;
+  width:20%;
+}
+
+.td-file2 {
+  display:inline-block;
+  width:20%;
+}
+
+.tbl-button {
+  float: right;
+	cursor: pointer;
+}
+
+/* Font-Awesome */
+
+.fa-plus-circle {
+  zoom: 1.1;
+  /*background-color: white;
+  color: #096592;*/ }
+
+.fa-minus-circle {
+  zoom: 1.1;
+  /*background-color: white;
+  color: #096592;*/ }

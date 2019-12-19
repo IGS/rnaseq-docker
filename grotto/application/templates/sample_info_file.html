@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" type="text/css" href="/static/sample_info_file.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="/static/js/sample_info_file.js"></script>
+    {% if 'error_cell' in session %}
+      {% for cell in session['error_cell'] %}
+        <style> #{{ cell }}
+          {
+            outline: Red solid thick;
+          }
+        </style>
+      {% endfor %}
+    {% endif %}
+{% endblock %}
+
+{% block title %}Sample Info File{% endblock %}
+
+{% block body %}
+      <form name="input_file" id="input" action="{{ url_for('main_bp.sample_info_file') }}" method="post" class="input-parameters" enctype="multipart/form-data">
+
+      <div class="upload">
+          <span class="upload-label"><label for="sif-browse">Sample Info File Location</label></span>
+          <span class="tooltip"><a href="#">?</a><span class="tooltiptext">The sample info file that is to be uploaded should have a single line header stating the column names.</span></span>
+          <input type="file" name="sif_browse" id="sif-browse">
+          <button type="submit" name="Upload"
+          {% if 'edit_sif' in session and session['edit_sif']==1 %}
+            disabled
+          {% endif %}
+          ><i class="fas fa-file-upload"></i> Upload</button>
+      </div>
+      <div class="tbl-wrapper" id="tbl-wrapper">
+        <div id="row-headers">
+          <span class="td-number"></span>
+          <span class="td-sample">Sample ID</span>
+          <span class="td-group">Group ID</span>
+          <span class="td-file1">File 1</span>
+          <span class="td-file2">File 2</span>
+          <span class="tbl-button"></span>
+        </div>
+
+        {% for entry in result%}
+          <div class="row-body" id="row-{{ entry['count'] }}">
+            <span class="td-number"><input type="text" name="input_r{{ entry['count'] }}" value="{{ entry['count'] }}" class="entry-count" style="border:none; background-color: white;" readonly="readonly"></span>
+            <span class="td-sample"><input type="text" name="input_r{{ entry['count'] }}_sample_id" id="input-r{{ entry['count'] }}-sample-id" value="{{ entry['sample_id'] }}"></span>
+            <span class="td-group"><input type="text" name="input_r{{ entry['count'] }}_group_id" id="input-r{{ entry['count'] }}-group-id" value="{{ entry['group_id'] }}"></span>
+            <span class="td-file1"><input type="text" name="input_r{{ entry['count'] }}_file_1" id="input-r{{ entry['count'] }}-file-1" value="{{ entry['file_1'] }}"></span>
+            <span class="td-file2"><input type="text" name="input_r{{ entry['count'] }}_file_2" id="input-r{{ entry['count'] }}-file-2" value="{{ entry['file_2'] }}"></span>
+            <span class="tbl-button"><a class="circle remove-new" id="remove-button-{{ entry['count'] }}"><i class="fas fa-minus-circle"></i></a></span>
+          </div>
+        {% endfor %}
+        </div>
+        <a class="circle" id="add-new"><i class="fas fa-plus-circle"></i></i></a>
+        <div style="clear:right; margin-top:60px;">
+	      {% if 'edit_sif' in session and session['edit_sif']==1 %}
+        <button type="submit" name="Submit">Submit</button>
+        {% else %}
+        <button type="submit" name="Next">Next <i class="fas fa-arrow-right"></i></button>
+        {% endif %}
+        </div>
+      </form>
+{% endblock %}

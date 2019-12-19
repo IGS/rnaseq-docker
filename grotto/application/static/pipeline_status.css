@@ -1,0 +1,77 @@
+
+/* pipeline_status.css also serves recent_pipelines.html */
+
+.list-header td {
+	padding-left: 25px;
+  padding-right: 25px;
+  background-color: #ffe4ba;
+}
+
+.list-output {
+  display: inline-block;
+  font-size: 18px;
+  margin: 10px 10px 10px 0;
+}
+
+.list-output tr {
+  height: 42px;
+  margin-left: 11px;
+}
+
+table.list-output tr:hover td{
+  background-color: #97cfbf;
+}
+
+.list-collapsable td {
+  padding-left: 10px;
+  padding-right: 10px;
+  background-color: #fff9f1;
+}
+
+.list-pipeline {
+  background-color: #fff9f1;
+  height: 42px;
+}
+
+.list-pipeline td{
+	padding-left: 10px;
+  padding-right: 10px;
+}
+
+.list-pipeline a{
+	float: left
+}
+
+.progress-bar {
+  margin: 20px 20px 20px 0;
+  font-size: 18px;
+	border: 1px solid black;
+}
+
+.progress-bar label {
+  display:block;
+  padding: 10px;
+}
+
+.pipe-options {
+	width 50%;
+}
+
+.pipe-options button {
+	font-size: 18px;
+	background-color: #096592;
+	width: 175px;
+	height: 35px;
+	color: #ffffff;
+	margin: 30px 30px 30px 0px;
+	cursor: pointer;
+	border-radius: 30px;
+}
+
+.pipe-options button:disabled {
+	background-color: #D3D3D3;
+}
+
+#proj-select {
+	margin: 30px 0 30px 0;
+}

@@ -1,0 +1,86 @@
+{% extends "layout.html" %}
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" type="text/css" href="/static/config_file_form.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="/static/js/config_file_form.js"></script>
+
+    {% if 'required_fields' in session %}
+      {% for req in session['required_fields'] %}
+        <style>
+          #{{ req[0] + "-" + req[1] }}::after {
+            content: "*";
+            color: Red;
+            float: right;
+          }
+        </style>
+      {% endfor %}
+    {% endif %}
+{% endblock %}
+
+{% block title %}Config File Form{% endblock %}
+
+{% block body %}
+  <form name="input_file" id="input" action="{{ url_for('main_bp.config_file_form') }}" method="post" class="input-parameters" enctype="multipart/form-data">
+
+    <p style="margin-left:5%;">(Optional) Upload a pre-made config file.</p>
+    <div class="upload">
+        <span class="upload-label"><label for="cff-browse">Config File Location</label></span>
+        <span><input type="file" name="cff_browse" id="cff-browse" value=''></span>
+        <span>
+          <button type="submit" name="Upload"
+          {% if 'edit_cff' in session and session['edit_cff']==1 %}
+            disabled
+          {% endif %}
+          ><i class="fas fa-file-upload"></i> Upload</button>
+        </span>
+    </div>
+    {% if 'cff_base' in session %}
+      <p>File '{{session['cff_base']}}' has been successfully uploaded</p>
+      <button type="submit" name="Next">Next <i class="fas fa-arrow-right"></i></button>
+    {% endif %}
+
+    <div id=circle-key>
+      <div class="circle-green"></div>
+      <span>Sufficient default values</span>
+      <div class="circle-yellow"></div>
+      <span>Default specific requirements</span>
+      <div class="circle-red"></div>
+      <span>Multiple required fields</span>
+    </div>
+
+    <div id="accordion" class="acc-container">
+
+        {% for component in result %}
+        <div class="acc-btn">
+          <div class="{{ result[component]['0']['color'] }}"></div>
+          <h3>{{ result[component]['0']['title'] }}</h3>
+          <span>{{ result[component]['0']['description'] }}</span>
+          <img src="static/down-arrow.png"/>
+        </div>
+        <div class="acc-content">
+          <p class="req-msg">Fields with <span>*</span> are required.</p>
+          <div class="acc-content-inner">
+            <table>
+              {% for i in range(0,result[component]|length) %}
+              <tr>
+                <td style="width:400px;"><label id="{{ component }}-{{ result[component][i|string]['key'] }}">{{ result[component][i|string]['key'] }}</label></td>
+                <td><input type="text" name="{{ component }}_{{ result[component][i|string]['key'] }}" value="{{ result[component][i|string]['value'] }}"></td>
+              <td><div class="tooltip"><a href="#">?</a><span class="tooltiptext">{{ result[component][i|string]['comment'] }}</span></div></td></tr>
+              {% endfor %}
+            </table>
+          </div>
+        </div>
+        {% endfor %}
+
+    </div><!-- end acc-container -->
+
+    {% if 'edit_cff' in session and session['edit_cff']==1 %}
+    <button type="submit" name="Next">Submit</button>
+    {% else %}
+      {% if result|length != 0 %}
+        <button style="margin:30px 5% 30px 0;" type="submit" name="Next">Next <i class="fas fa-arrow-right"></i></button>
+      {% endif %}
+    {% endif %}
+  </form>
+{% endblock %}

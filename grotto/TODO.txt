@@ -1,0 +1,3 @@
+* On the pipeline_status page, the table grows too large when uncollapsed
+* Work on implementing RabbitMQ message acknowledgements.  Currently sending the message returns true, which does not reflect if the command succeeded or not
+* Eventually have RabbitMQ send messages to an Ergatis listener as well.  This would decouple Ergatis from Grotto, and the listener would be coupled to Ergatis instead.

@@ -1,0 +1,1 @@
+If you are running Flask and make changes to the code, after saving the code Flask will redeploy itself.  This can be problematic in the sense that any objects created are immediately destroyed.  This can cause some wonky effects when testing.
