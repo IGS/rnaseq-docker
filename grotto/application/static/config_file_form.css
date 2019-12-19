@@ -1,0 +1,128 @@
+
+.input-parameters {
+  width: 100%;
+  padding: 0;
+}
+
+#accordion {
+  clear: right;
+}
+
+.acc-btn {
+  margin:0 auto;
+  padding:10px 25px;
+  cursor: pointer;
+  border: 1px solid #c5c7cb;
+}
+
+.acc-btn h3{
+  width: 20%;
+  display: inline-block;
+}
+
+.acc-btn img {
+  float: right;
+  margin-top: 25px;
+}
+
+.acc-content {
+  height:0px;
+  width:98%;
+  margin:0 auto;
+  overflow:hidden;
+  /*background:#2C3E50;*/
+}
+
+.acc-content-inner {
+  padding:30px;
+}
+
+.open {
+  height: auto;
+}
+
+h3 {
+  color:#096592;
+  margin-left: 10px;
+}
+
+table{
+  width:100%;
+  display: inline-block;
+}
+.selected {
+  color:#1ABC9C;
+}
+
+select{
+  padding-left: 20px;
+  padding: 5px;
+  font-size: 18px;
+  border: 1px solid #096592;
+  background-color: #f2f7ff;
+  color: #908e8e;
+  width: 287px;
+  margin: 30px 30px 0px 30px;
+}
+
+.req-msg {
+  color: #096592;
+  float: right;
+  margin: 10px 10px 0px 0px;
+}
+
+.req-msg span {
+  color: red;
+}
+
+/* Circle images */
+
+#circle-key {
+  float: right;
+  margin: 25px 10px 25px auto;
+}
+
+#circle-key span {
+  margin-left: 10px;
+  margin-right: 25px;
+}
+
+.circle-red,.circle-yellow,.circle-green {
+  opacity: 0.5;
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+}
+
+.circle-red {
+  background-color: Red;
+}
+
+.circle-yellow {
+  background-color: Yellow;
+}
+
+.circle-green {
+  background-color: Green;
+}
+
+/* File upload section */
+.upload {
+  width:100%;
+  margin-bottom: 30px;
+}
+
+.upload input {
+  width: 50%
+}
+
+button {
+  margin-right: 5%;
+}
+
+.upload-label {
+  display: inline-block;
+  width: 20%;
+  margin-left:5%
+}

@@ -1,0 +1,1 @@
+* On the pipeline_status page, the table grows too large when uncollapsed

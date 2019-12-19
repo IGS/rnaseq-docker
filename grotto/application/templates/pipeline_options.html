@@ -1,0 +1,492 @@
+{% extends "layout.html" %}
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" type="text/css" href="static/pipeline_options.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="/static/js/pipeline_options.js"></script>
+{% endblock %}
+
+{% block title %}Pipeline Options{% endblock %}
+
+{% block body %}
+      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+            <!-- top table -->
+            <div class="body_msgs">
+            {% if messages %}
+              <ul class="flashes">
+              {% for message in messages %}
+                <li>{{ message }}</li>
+              {% endfor %}
+              </ul>
+            {% endif %}
+            </div><!-- end body_right -->
+      {% endif %}
+      {% endwith %}
+
+      <form name="input_file" id="input" action="{{ url_for('main_bp.pipeline_options') }}" method="post" class="input-parameters" enctype="multipart/form-data">
+
+      <div class="tbl-wrapper">
+        <div class="form-line">
+          <span class="form-label"><label for="genome_analysis">Organism Type</label></span>
+          <span class="form-input" style="vertical-align:middle;">
+            Eukaryotic
+            <label class="pipeline-switch">
+              <input type="checkbox" name="pipeline_type", id="pipeline-type"
+              {% if 'pipeline_type' in session and session['pipeline_type']=='Prokaryotic' %}
+                checked
+              {% endif %}>
+              <span class="slider round"></span>
+            </label>
+            Prokaryotic
+          <span>
+        </div>
+        <div class="form-line">
+          <span class="form-label"><label for="reference">Reference</label></span>
+          <span class="form-input"><input type="text" name="reference" id="reference"
+            {% if 'pipeline_options' in session %}
+              value="{{ session['pipeline_options']['reference'] }}"
+            {% endif %}
+            ></span>
+          <div class="tooltip"><a href="#">?</a><span class="tooltiptext-left">Path to FASTA reference genome</span></div>
+        </div>
+        <div class="form-line">
+          <span class="form-label"><label for="gtf">GFF3/GTF</label></span>
+          <span class="form-input"><input type="text" name="gtf" id="gtf"
+            {% if 'pipeline_options' in session %}
+              value="{{ session['pipeline_options']['gtf'] }}"
+            {% endif %}
+            ></span>
+          <div class="tooltip"><a href="#">?</a><span class="tooltiptext-left">Path to annotation file</span></div>
+        </div>
+        <div class="form-line">
+          <span class="form-label"><label for="mapping_file">Gene Mapping File (optional)</label></span>
+          <span class="form-input"><input type="text" name="mapping_file" id="mapping_file"
+            {% if 'pipeline_options' in session %}
+              value="{{ session['pipeline_options']['mapping_file'] }}"
+            {% endif %}
+            ></span>
+          <div class="tooltip"><a href="#">?</a><span class="tooltiptext-left">Path to mapping file containing contigs to gene IDs (used in report creation)</span></div>
+        </div>
+        <div class="form-line">
+          <span class="form-label"><label for="repository-root">Repository Root</label></span>
+          <span class="form-input"><input type="text" name="repository_root" id="repository-root"
+              value="/opt/projects/repository"
+            {% if 'pipeline_options' in session %}
+              value="{{ session['pipeline_options']['repository_root'] }}"
+            {% endif %}
+            ></span>
+          <div class="tooltip"><a href="#">?</a><span class="tooltiptext-left">Project area path to write pipeline output to</span></div>
+        </div>
+        <div class="form-line">
+          <span class="form-label"><label for="project-code">Project ID</label></span>
+          <span class="form-input"><input type="text" name="project_code" id="project-code"
+              value="Docker"
+            {% if 'pipeline_options' in session %}
+              value="{{ session['pipeline_options']['project_code'] }}"
+            {% endif %}
+            /></span>
+          <div class="tooltip"><a href="#">?</a><span class="tooltiptext-left">ID of project. Can be used to retrieve results in Grotto.</span></div>
+        </div>
+        <div class="form-line">
+          <span class="form-label"><label for="annotation-format">Annotation Format</label></span>
+          <span class="form-input"><select name="annotation_format" id="annotation-format">
+            <option value="GTF">GTF</option>
+            <option value="GFF3"
+            {% if 'pipeline_options' in session and session['pipeline_options']['annotation_format'] == 'GFF3' %}
+              selected="selected"
+            {% endif %}
+            >GFF3</option>
+            </select>
+          </span>
+        </div>
+
+        <div class="form-line euk-only">
+          <input type="checkbox" name="use_tophat" id="use-tophat"
+            {% if 'pipeline_options' in session and session['pipeline_options']['tophat_legacy']=='on' %}
+              checked
+            {% endif %}
+            >Use Tophat in place of HiSat2
+            <div class="tooltip"><a href="#">?</a><span class="tooltiptext-left">Use Tophat in place of HiSat2.</span></div>
+        </div>
+
+        <div class="form-line">
+          <input type="checkbox" name="build_indexes" id="build-indexes"
+            {% if 'pipeline_options' in session and session['pipeline_options']['build_indexes']=='on' %}
+              checked
+            {% endif %}
+            >Build Indexes
+            <div class="tooltip"><a href="#">?</a><span class="tooltiptext-left">Build HiSat2 or Bowtie reference indexes.</span></div>
+        </div>
+
+        <div class="form-line">
+          <input type="checkbox" name="quality_stats" id="quality-stats"
+            {% if 'pipeline_options' in session and session['pipeline_options']['quality_stats']=='on' %}
+              checked
+            {% endif %}
+            >Quality Stats
+            <div class="tooltip"><a href="#">?</a><span class="tooltiptext-left">Execute fastx_quality_stats component.</span></div>
+        </div>
+
+        <div class="form-line">
+          <input type="checkbox" name="quality_trimming" id="quality-trimming"
+            {% if 'pipeline_options' in session and session['pipeline_options']['quality_trimming']=='on' %}
+              checked
+            {% endif %}
+            >Quality Trimming
+            <div class="tooltip"><a href="#">?</a><span class="tooltiptext-left">Execute fastx_trimming component. Also generates quality statistics.</span></div>
+        </div>
+
+        <div class="form-line">
+          <input type="checkbox" name="alignment" id="alignment"
+            {% if 'pipeline_options' in session and session['pipeline_options']['alignment']=='on' %}
+              checked
+            {% endif %}
+            >Alignment
+            <div class="tooltip"><a href="#">?</a><span class="tooltiptext-left">Perform alignments with HiSat2 or Tophat.</span></div>
+        </div>
+        <div class="form-line index-file-div"
+          {% if not 'pipeline_options' in session or (session['pipeline_options']['alignment']=='off' or session['pipeline_options']['build_indexes']=='on') %}
+          style="display:none;"
+          {% endif %}>
+          <label class="sub-label" for="index-file" id="index-file-label"
+            >Index File</label>
+          <span class="sub-textbox"><input type="text" name="index_file" id="index-file"
+            {% if 'pipeline_options' in session and session['pipeline_options']['index_file'] %}
+              value="{{ session['pipeline_options']['index_file'] }}"
+            {% endif %}
+            /></span>
+          <div class="tooltip" id="index-file-tooltip">
+            <a href="#">?</a><span class="tooltiptext-left">Path to HiSat2 or Bowtie index file.  Associated files must be in same directory.</span>
+          </div>
+        </div>
+
+        <div class="form-line">
+          <input type="checkbox" name="visualization" id="visualization"
+            {% if 'pipeline_options' in session and session['pipeline_options']['visualization']=='on' %}
+              checked
+            {% endif %}
+            >Visualization
+            <div class="tooltip"><a href="#">?</a><span class="tooltiptext-left">Execute bam2bigwig component.</span></div>
+        </div>
+        <div class="form-line file-type-div1"
+          {% if not 'pipeline_options' in session or session['pipeline_options']['visualization']=='off' or session['pipeline_options']['alignment']=='on' %}
+            style="display:none;"
+          {% endif %}
+        >
+          <label class="sub-label" for="file-type1" id="file-type-label1">File Type</label>
+          <select name="file_type1" id="file-type1" class="file-type">
+            <option value="none"></option>
+            <option value="SAM"
+            {% if 'pipeline_options' in session and session['pipeline_options']['file_type'] == 'SAM' %}
+              selected="selected"
+            {% endif %}
+            >SAM</option>
+            <option value="BAM"
+            {% if 'pipeline_options' in session and session['pipeline_options']['file_type'] == 'BAM' %}
+              selected="selected"
+            {% endif %}
+            >BAM</option>
+          </select>
+        </div>
+        <div class="form-line sorted-div1"
+          {% if not 'pipeline_options' in session or session['pipeline_options']['visualization']=='off' or session['pipeline_options']['alignment']=='on' %}
+            style="display:none;"
+          {% endif %}
+        >
+          <label class="sub-label" for="sorted1" id="sorted-label1">Sorted</label>
+          <select name="sorted1" id="sorted1" class="sortedd">
+            <option value="none"></option>
+            <option value="Position"
+            {% if 'pipeline_options' in session and session['pipeline_options']['sorted'] == 'Position' %}
+              selected="selected"
+            {% endif %}
+            >Position</option>
+            <option value="Name"
+            {% if 'pipeline_options' in session and session['pipeline_options']['sorted'] == 'Name' %}
+                selected="selected"
+            {% endif %}
+            >Name</option>
+          </select>
+        </div>
+
+        <div class="form-line">
+          <input type="checkbox" name="rpkm_analysis" id="rpkm-analysis"
+            {% if 'pipeline_options' in session and session['pipeline_options']['rpkm_analysis']=='on' %}
+              checked
+            {% endif %}
+            >RPKM Analysis
+            <div class="tooltip"><a href="#">?</a><span class="tooltiptext-left">Execute RPKM coverage analysis component.</span></div>
+        </div>
+        <div class="form-line file-type-div2"
+          {% if not 'pipeline_options' in session or session['pipeline_options']['rpkm_analysis']=='off' or session['pipeline_options']['alignment']=='on' %}
+            style="display:none;"
+          {% endif %}
+        >
+          <label class="sub-label" for="file-type2" id="file-type-label2">File Type</label>
+          <select name="file_type2" id="file-type2" class="file-type">
+            <option value="none"></option>
+            <option value="SAM"
+            {% if 'pipeline_options' in session and session['pipeline_options']['file_type'] == 'SAM' %}
+              selected="selected"
+            {% endif %}
+            >SAM</option>
+            <option value="BAM"
+            {% if 'pipeline_options' in session and session['pipeline_options']['file_type'] == 'BAM' %}
+              selected="selected"
+            {% endif %}
+            >BAM</option>
+          </select>
+        </div>
+        <div class="form-line sorted-div2"
+          {% if not 'pipeline_options' in session or session['pipeline_options']['rpkm_analysis']=='off' or session['pipeline_options']['alignment']=='on' %}
+            style="display:none;"
+          {% endif %}
+        >
+          <label class="sub-label" for="sorted2" id="sorted-label2">Sorted</label>
+          <select name="sorted2" id="sorted2" class="sortedd">
+            <option value="none"></option>
+            <option value="Position"
+            {% if 'pipeline_options' in session and session['pipeline_options']['sorted'] == 'Position' %}
+              selected="selected"
+            {% endif %}
+            >Position</option>
+            <option value="Name"
+            {% if 'pipeline_options' in session and session['pipeline_options']['sorted'] == 'Name' %}
+              selected="selected"
+            {% endif %}
+            >Name</option>
+          </select>
+        </div>
+
+        <div class="form-line">
+          <input type="checkbox" name="differential_gene_expression" id="differential-gene-expression"
+            {% if 'pipeline_options' in session and session['pipeline_options']['differential_gene_expression']=='on' %}
+              checked
+            {% endif %}
+            >Differential Gene Expression
+            <div class="tooltip"><a href="#">?</a><span class="tooltiptext-left">Execute differential gene expression analysis component.</span></div>
+        </div>
+        <div class="form-line file-type-div3"
+          {% if not 'pipeline_options' in session or session['pipeline_options']['differential_gene_expression']=='off' or session['pipeline_options']['alignment']=='on' %}
+            style="display:none;"
+          {% endif %}
+        >
+          <label class="sub-label" for="file-type3" id="file-type-label3">File Type</label>
+          <select name="file_type3" id="file-type3" class="file-type">
+            <option value="none"></option>
+            <option value="SAM"
+            {% if 'pipeline_options' in session and session['pipeline_options']['file_type'] == 'SAM' %}
+              selected="selected"
+            {% endif %}
+            >SAM</option>
+            <option value="BAM"
+            {% if 'pipeline_options' in session and session['pipeline_options']['file_type'] == 'BAM' %}
+              selected="selected"
+            {% endif %}
+            >BAM</option>
+          </select>
+        </div>
+        <div class="form-line sorted-div3"
+            {% if not 'pipeline_options' in session or session['pipeline_options']['differential_gene_expression']=='off' or session['pipeline_options']['alignment']=='on' %}
+            style="display:none;"
+          {% endif %}
+        >
+          <label class="sub-label" for="sorted3" id="sorted-label3">Sorted</label>
+          <select name="sorted3" id="sorted3" class="sortedd">
+            <option value="none"></option>
+            <option value="Position"
+            {% if 'pipeline_options' in session and session['pipeline_options']['sorted'] == 'Position' %}
+              selected="selected"
+            {% endif %}
+            >Position</option>
+            <option value="Name"
+            {% if 'pipeline_options' in session and session['pipeline_options']['sorted'] == 'Name' %}
+              selected="selected"
+            {% endif %}
+            >Name</option>
+          </select>
+        </div>
+        <div class="form-line count-div"
+          {% if not 'pipeline_options' in session or not session['pipeline_options']['differential_gene_expression']=='on' or session['pipeline_options']['alignment']=='on' %}
+            style="display:none"
+          {% endif %}
+        >
+            <input class="sub-checkbox" name="count" id="count" type="checkbox"
+            {% if 'pipeline_options' in session and session['pipeline_options']['count']=='on' %}
+              checked
+            {% endif %}
+            >
+            <label id="count-label">Compute Counts<label>
+            <div class="tooltip" id="count-tooltip"><a href="#">?</a><span class="tooltiptext-left">Generate count files. If unchecked, assumes counts files present in sample.info file.</span></div>
+        </div>
+        <div class="form-line comparison-groups-div1"
+          {% if not 'pipeline_options' in session or not session['pipeline_options']['differential_gene_expression']=='on' %}
+          style="display:none;"
+        {% endif %}
+        >
+          <label class="sub-label" for="comparison-groups1" id="comparison-groups-label1">Comparison Groups</label>
+          <span class="sub-textbox"><input type="text" id="comparison-groups1" name="comparison_groups1" class="comparison-groups"
+            {% if 'pipeline_options' in session and session['pipeline_options']['comparison_groups'] %}
+              value="{{ session['pipeline_options']['comparison_groups'] }}"
+            {% endif %}
+          /></span>
+          <div class="tooltip" id="comparison-groups1-tooltip">
+            <a href="#">?</a><span style="width:350px;" class="tooltiptext-left">String of groups to compare. e.g. "GRP#2vsGRP#1,GRP#3vsGRP#1".</span>
+          </div>
+        </div>
+
+        <div class="form-line euk-only">
+          <input type="checkbox" name="isoform_analysis" id="isoform-analysis"
+            {% if 'pipeline_options' in session and session['pipeline_options']['isoform_analysis']=='on' %}
+              checked
+            {% endif %}
+            >Isoform Analysis
+            <div class="tooltip"><a href="#">?</a><span class="tooltiptext-left">Execute isoform identification analysis component.</span></div>
+        </div>
+        <div class="form-line euk-only file-type-div4"
+          {% if not 'pipeline_options' in session or session['pipeline_options']['isoform_analysis']=='off' or session['pipeline_options']['alignment']=='on' %}
+            style="display:none;"
+          {% endif %}
+        >
+          <label class="sub-label" for="file-type4" id="file-type-label4">File Type</label>
+          <select name="file-type4" id="file-type4" class="file-type">
+            <option value="none"></option>
+            <option value="SAM"
+            {% if 'pipeline_options' in session and session['pipeline_options']['file_type'] == 'SAM' %}
+              selected="selected"
+            {% endif %}
+            >SAM</option>
+            <option value="BAM"
+            {% if 'pipeline_options' in session and session['pipeline_options']['file_type'] == 'BAM' %}
+              selected="selected"
+            {% endif %}
+            >BAM</option>
+          </select>
+        </div>
+        <div class="form-line euk-only sorted-div4"
+          {% if not 'pipeline_options' in session or session['pipeline_options']['isoform_analysis']=='off' or session['pipeline_options']['alignment']=='on' %}
+            style="display:none;"
+          {% endif %}
+        >
+          <label class="sub-label" for="sorted4" id="sorted-label4">Sorted</label>
+          <select name="sorted4" id="sorted4" class="sortedd">
+            <option value="none"></option>
+            <option value="Position"
+            {% if 'pipeline_options' in session and session['pipeline_options']['sorted'] == 'Position' %}
+              selected="selected"
+            {% endif %}
+            >Position</option>
+            <option value="Name"
+            {% if 'pipeline_options' in session and session['pipeline_options']['sorted'] == 'Name' %}
+              selected="selected"
+            {% endif %}
+            >Name</option>
+          </select>
+        </div>
+        <div class="form-line euk-only include-novel-div"
+          {% if not 'pipeline_options' in session or not session['pipeline_options']['isoform_analysis']=='on' %}
+            style="display:none"
+          {% endif %}
+        >
+          <input class="sub-checkbox" name="include_novel" id="include-novel" type="checkbox"
+            {% if 'pipeline_options' in session and session['pipeline_options']['include_novel']=='on' %}
+              checked
+            {% endif %}
+            ><label id="in-label">Include Novel</label>
+            <div class="tooltip" id="in-tooltip">
+              <a href="#">?</a><span class="tooltiptext-left">Will not use reference annotation to determine isoforms.</span>
+            </div>
+        </div>
+
+        <div class="form-line euk-only">
+          <input type="checkbox" name="differential_isoform_analysis" id="differential-isoform-analysis"
+            {% if 'pipeline_options' in session and session['pipeline_options']['differential_isoform_analysis']=='on' %}
+              checked
+            {% endif %}
+            >Differential Isoform Analysis
+            <div class="tooltip"><a href="#">?</a><span class="tooltiptext-left">Execute differential isoform identification analysis component.</span></div>
+        </div>
+        <div class="form-line euk-only file-type-div5"
+          {% if not 'pipeline_options' in session or session['pipeline_options']['differential_isoform_analysis']=='off' or session['pipeline_options']['alignment']=='on' %}
+            style="display:none;"
+          {% endif %}
+        >
+          <label class="sub-label" for="file-type5" id="file-type-label5">File Type</label>
+          <select name="file_type5" id="file-type5" class="file-type">
+            <option value="none"></option>
+            <option value="SAM"
+            {% if 'pipeline_options' in session and session['pipeline_options']['file_type'] == 'SAM' %}
+              selected="selected"
+            {% endif %}>SAM</option>
+            <option value="BAM"
+            {% if 'pipeline_options' in session and session['pipeline_options']['file_type'] == 'BAM' %}
+              selected="selected"
+            {% endif %}>BAM</option>
+          </select>
+        </div>
+        <div class="form-line euk-only sorted-div5"
+          {% if not 'pipeline_options' in session or session['pipeline_options']['differential_isoform_analysis']=='off' or session['pipeline_options']['alignment']=='on' %}
+            style="display:none;"
+          {% endif %}
+        >
+          <label class="sub-label" for="sorted5" id="sorted-label5">Sorted</label>
+          <select name="sorted5" id="sorted5" class="sortedd" >
+            <option value="none"></option>
+            <option value="Position"
+            {% if 'pipeline_options' in session and session['pipeline_options']['sorted'] == 'Position' %}
+              selected="selected"
+            {% endif %}
+            >Position</option>
+            <option value="Name"
+            {% if 'pipeline_options' in session and session['pipeline_options']['sorted'] == 'Name' %}
+              selected="selected"
+            {% endif %}
+            >Name</option>
+          </select>
+        </div>
+        <div class="form-line euk-only comparison-groups-div2"
+          {% if not 'pipeline_options' in session or not session['pipeline_options']['differential_isoform_analysis']=='on' %}
+            style="display:none;"
+          {% endif %}
+        >
+          <label class="sub-label" for="comparison-groups2" id="comparison-groups-label2">Comparison Groups</label>
+          <span class="sub-textbox"><input type="text" id="comparison-groups2" name="comparison_groups2" class="comparison-groups"
+            {% if 'pipeline_options' in session and session['pipeline_options']['comparison_groups'] %}
+              value="{{ session['pipeline_options']['comparison_groups'] }}"
+            {% endif %}
+          /></span>
+          <div class="tooltip" id="comparison-groups2-tooltip">
+            <a href="#">?</a><span style="width:350px;" class="tooltiptext-left">String of groups to compare. e.g. "GRP#2vsGRP#1,GRP#3vsGRP#1".</span>
+          </div>
+        </div>
+        <div class="form-line euk-only use-ref-gtf-div"
+          {% if not 'pipeline_options' in session or not session['pipeline_options']['differential_isoform_analysis']=='on' %}
+            style="display:none;"
+          {% endif %}
+        >
+          <input class="sub-checkbox" name="use_ref_gtf" id="use-ref-gtf" type="checkbox"
+              {% if 'pipeline_options' in session and session['pipeline_options']['use_ref_gtf']=='on' %}
+                checked
+              {% endif %}
+            ><label id="use-ref-gtf-label" >Use Reference Annotation<label>
+            <div class="tooltip" id="use-ref-gtf-tooltip">
+              <a href="#">?</a><span class="tooltiptext-left">Will use reference annotation file in Cuffdiff analysis.</span>
+            </div>
+        </div>
+        <div class="form-line euk-only old-cuff">
+          <input class="sub-checkbox" name="old_cufflinks" id="old-cufflinks" type="checkbox">
+          <label id="old-cuff-label">Use Legacy Cufflinks<label>
+          <div class="tooltip" id="old-cuff-tooltip">
+            <a href="#">?</a><span class="tooltiptext-left">Use the older version of Cuffsuite.</span>
+          </div>
+        </div>
+
+      </div>
+      {% if 'edit_po' in session and session['edit_po']==1 %}
+        <button type="submit" name="Next">Submit</button>
+      {% else %}
+        <button type="submit" name="Next">Next <i class="fas fa-arrow-right"></i></button>
+      {% endif %}
+      </form>
+{% endblock %}

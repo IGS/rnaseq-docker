@@ -1,0 +1,13 @@
+config.internal.py
+__pycache__/*
+flask_session/*
+.pytest_cache/*
+.vscode/*
+.env
+temp.info
+log.txt
+static/temp.config
+static/temp.info
+static/pipeline_options.txt
+static/tmp/*
+user*

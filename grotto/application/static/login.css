@@ -1,0 +1,29 @@
+.body-title {
+  display: none;
+}
+
+.input-parameters {
+  width: 35%;
+}
+
+.form-field {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  clear: right;
+}
+
+/* Input textbox - float in login credentials
+   a tag - Download Grotto SOP - Float in section */
+input, main a {
+  float: right;
+}
+
+label {
+  display: inline-block;
+  margin-top: 5px;
+}
+
+button {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}

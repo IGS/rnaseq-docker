@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" type="text/css" href="/static/pipeline_status.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script>
+    $(document).ready(function(){
+    // bind change event to select
+    $('#proj-select').change(function () {
+        var url = $(this).val(); // get selected value
+        console.log("Selected code: " + url)
+        if (url) {
+            // Hardcode from root URL the redirect is down a level
+            window.location = "/recent_pipelines/" + url; // redirect
+        }
+        return false;
+    });
+  });
+    </script>
+{% endblock %}
+
+{% block title %}View Recent Pipelines{% endblock %}
+
+{% block body %}
+  {% if pipelines %}
+  <h2>Select a recent pipeline</h2>
+  {% else %}
+  <h2>Select a project code</h2>
+  {% endif %}
+  {% if codes %}
+  <div class="custom-select">
+    <select id="proj-select">
+    <option value="dummy" selected>--- Select a project ---</option>
+    {% for proj_code in codes %}
+    <option value="{{ proj_code }}">{{ proj_code }}</option>
+    {% endfor %}
+    </select>
+  </div>
+  {% if pipelines %}
+  <div id="pipeline-div">
+  <table id="pipeline-tbl" class="list-output">
+    <tr class="list-header">
+      <td>Pipeline ID</td>
+      <td>View Pipeline</td>
+      <td>Status</td>
+      <td>Start Time</td>
+    </tr>
+    {% for pipeline in pipelines %}
+      <tr class="list-pipeline">
+        <td>{{ pipeline['pipeline_id'] }} </td>
+        <td><a href="{{ url_for('main_bp.pipeline_status', pipeline_id=pipeline['pipeline_id']) }}">View</a></td>
+        <td>{{ pipeline['status'] }}</td>
+        <td>{{ pipeline['start_time'] }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+  </div>
+  {% else %}
+    <p id="no-pipelines">You have no active pipelines associated with project code "{{ proj_code }}".</p>
+  {% endif %} <!-- end pipelines loop -->
+  {% else %}
+  <p id="no-projects">You have no projects.</p>
+  {% endif %} <!-- end proj_codes loop -->
+{% endblock %}
