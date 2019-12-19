@@ -1,16 +1,26 @@
+#!/usr/bin/env python3
 import os
 import pytest
 import sys
 sys.path.append("..")
 from flask import current_app
+from application import create_app
 
 ### In Development ###
 
 @pytest.fixture
-def client():
-    current_app.config['TESTING'] = True
-    client = current_app.test_client()
-    yield client
+def test_client():
+    test_app = create_app()
+    test_app.config['TESTING'] = True
+    test_client = test_app.test_client()
+
+    # Establish an application context before running the tests.
+    ctx = test_app.app_context()
+    ctx.push()
+ 
+    yield test_client  # this is where the testing happens!
+    # Clean testing environment
+    ctx.pop()
 
 def login(client, username, password):
     return client.post('/login', data=dict(

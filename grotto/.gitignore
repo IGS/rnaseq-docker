@@ -1,6 +1,7 @@
 config.internal.py
 __pycache__/*
-application/__pycache/*
+application/__pycache__/*
+test/__pycache__/*
 flask_session/*
 .pytest_cache/*
 .vscode/*
