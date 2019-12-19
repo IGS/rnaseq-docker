@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+{% block head %}
+{% include 'includes/head.html' %}
+{% endblock %}
+
+<body>
+  {% include 'includes/header.html' %}
+
+  <div class="body-wrapper">
+    <div class="body-title">
+      <h1>{% block title %}{% endblock %}</h1>
+      <nav class="user-nav">
+        <a href="/static/GrottoSOP.pdf" download>download_SOP</a>
+        <a href="/help">help</a>
+        <a href="/sample_info_file">create_pipeline</a>
+        <a href="/recent_pipelines">recent_pipelines</a>
+      </nav>
+    </div><!-- end body-title -->
+
+    {% with errors = get_flashed_messages(category_filter=["message"]) %}
+    {% if errors %}
+          <div class="body-msgs">
+            <ul class="flash-error">
+            {% for msg in errors %}
+              <li>{{ msg }}</li>
+            {% endfor %}
+            </ul>
+          </div><!-- end body-msgs -->
+    {% endif %}
+    {% endwith %}
+    {% with successes = get_flashed_messages(category_filter=["success"]) %}
+    {% if successes %}
+          <div class="body-msgs">
+            <ul class="flash-success">
+            {% for msg in successes %}
+              <li>{{ msg }}</li>
+            {% endfor %}
+            </ul>
+          </div><!-- end body-msgs -->
+    {% endif %}
+    {% endwith %}
+    <main>
+
+        
+      {% block body %}{% endblock %}</main>
+    <p>Warning: Do not hit the BACK button in the browser</p>
+  </div><!-- end body-wrapper -->
+
+  {% include 'includes/footer.html' %}
+</body>
+</html>

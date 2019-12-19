@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block title %}Help{% endblock %}
+
+{% block body %}
+      <h1>Introduction</h1>
+      <br>
+        <p>Welcome to Grotto, the pipeline launcher tool for the IGS RNASeq pipeline.  This tool lets the user tweak the pipeline as he or she sees fit, as well as provide premade sample and component configuration files, which can be useful for repeat analyses.  When a pipeline is launched, the pipeline can be monitored, and results can be downloaded in the form of a BDBag object.  The user can also view recent pipelines by project as well.</p>
+      <h1>Sample Info File page</h1>
+      <br>
+        <p>This is the first page encountered when creating a new pipeline.  The user has the ability to either input samples directly into the page, adding rows as needed, or can upload a pre-made sample info file (ending in .info).</p>
+        <p>Clicking 'Next' will proceed to the Pipeline Options page.</p>
+      <h1>Pipeline Options page</h1>
+      <br>
+        <p>This page is where pipeline options are configured for the pipeline.  There is a toggle that lets the user select between a Prokaryotic run or a Eukaryotic run.  Note that selecting some checkboxes will cause secondary checkboxes to pop up, depending on the combination of selected boxes.</p>
+        <p>Clicking 'Next' will proceed to the Config File page.</p>
+      <h1>Config File page</h1>
+      <br>
+        <p>This page is where each component for the new pipeline can be configured.  The user has the ability to either provide configuration parameters directly onto the page, or can upload a pre-made config file (ending in .config)</p>
+        <p>If filling in manually, parameters with red asterisks are required, and the page will register an error if the user attempts to proceed with one of these parameters blank.</p>
+        <p>Also if filling in manually, it is important to pay attention to the colored circle for each component.  Each color implies a certain meaning:</p>
+        <ul>
+          <li>Green - Component parameters are fine as they are.</li>
+          <li>Yellow - Component has some parameters where the default value will work for the majority of people, but it may be wise to look over them.</li>
+          <li>Red - Component has parameters that are required and will require the user's attention.</li>
+        </ul>
+        <p>Clicking 'Next' will proceed to the Summary page.</p>
+      <h1>Summary page</h1>
+      <br>
+        <p>This page is where the selected files, options, and parameters can be reviewed before submitting the pipeline.  If there is an error, the "Edit" button will take the user back to that page to edit fields.  There is also a "Download" link to download the sample.info, pipeline_options.txt or pipeline.config file for use in future pipelines</p>
+        <p>Clicking "Submit" will submit the pipeline and proceed to the Pipeline Status page for this pipeline if the submission is successful</p>
+      <h1>Pipeline Status page</h1>
+      <br>
+        <p>This page is where a pipeline can be monitored.  The user can view the status and runtime of the pipeline as well as the status and runtimes for each component.</p>
+      <h1>Recent Pipelines page</h1>
+      <br>
+        <p>This page is where the user can select recent pipelines to view.  After selecting a project code, the 10 most recent pipelines belonging to that user are then shown to select.</p>
+{% endblock %}

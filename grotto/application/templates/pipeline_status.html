@@ -1,0 +1,234 @@
+{% extends "layout.html" %}
+{% block head %}
+    {{ super() }}
+    {% if not pipeline["status"] == "complete" %}
+    <meta http-equiv="refresh" content="60" />
+    {% endif %}
+    <link rel="stylesheet" type="text/css" href="/static/pipeline_status.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="/static/js/snap.svg-min.js"></script>
+    <script src="/static/js/pipeline_status.js"></script>
+    <script>
+
+      function showHide() {
+        //Toggle Arrow
+        var arrow = document.getElementById("arrow");
+        if (arrow.src.endsWith("down-arrow.png"))
+          arrow.src = arrow.src.replace("down-arrow", "up-arrow");
+        else
+          arrow.src = arrow.src.replace("up-arrow", "down-arrow");
+
+        //Toggle display
+        var display = "none";
+        var rows = document.getElementsByClassName("list-collapsable");
+        if (rows[0].style.display == "none")
+          display = "";
+        for (var i = 0; i < rows.length; i++) {
+          rows[i].style.display = display;
+        }
+      }
+
+      {% if pipeline['pipeline_id'] %}
+
+        //Setup the progress bar; ordered array from left-to-right
+        var bar_scales = [];
+        var bar_names = [];
+        var bar_status = [];
+        {% for component in pipeline["components"] %}
+          bar_scales.push({{ 1 }});
+          bar_names.push("{{ component["name"] }}");
+          bar_status.push("{{ component["status"] }}");
+        {% endfor %}
+
+        var total_bars = bar_scales.length;
+        // Spread polygon to take length of SVG box.  Leave some room for end point to show
+        var rect_default_width = Math.floor(2450 / bar_scales.length);
+        var rect_default_height = 200;
+        var pointer_default_width = 50;
+        var initial_bar_x = calculate_initial_x();
+        var initial_bar_y = 0;
+
+        var s;
+        var unfilled_arrow_color = "#AAA";
+        var glowing = 1;
+
+        function animate_glow(id) {
+          var poly = s.select('#' + id);
+          if (glowing) {
+            poly.attr('fill', "navy");
+            poly.animate( {  fill: "mediumblue" }, 1000, mina.easeinout, function(){animate_glow(id)});
+          } else {
+            poly.attr('fill', "mediumblue");
+            poly.animate( {  fill: "navy" }, 1000, mina.easeinout, function(){animate_glow(id)});
+          }
+          glowing = glowing ? 0 : 1;
+        }
+
+        function animate_segment(id, status) {
+          var poly = s.select('#' + id);
+          var gradient;
+          if (status == "complete") {
+            gradient = s.gradient('l(0, 0, 0, 0)darkgreen-forestgreen-' + unfilled_arrow_color);
+          } else if (status == "running") {
+            //var gradient = s.gradient('l(0, 0, 0, 0)navy-mediumblue-' + unfilled_arrow_color);
+            animate_glow(id)
+          } else if (status == "incomplete") {
+            gradient = s.gradient('l(0, 0, 0, 0)gray-silver-' + unfilled_arrow_color);
+          } else if (status == "pending") {
+            gradient = s.gradient('l(0, 0, 0, 0)darkkhaki-khaki-' + unfilled_arrow_color);
+          } else if (status == "interrupted") {
+            gradient = s.gradient('l(0, 0, 0, 0)indigo-purple-' + unfilled_arrow_color);
+          } else if (status == "failed" || status == "error") {
+            gradient = s.gradient('l(0, 0, 0, 0)darkred-crimson-' + unfilled_arrow_color);
+          }
+          if (status != "running"){
+            poly.attr('fill', gradient);
+            gradient.animate( { x2: 2.0 }, 100, mina.linear);
+          }
+        }
+
+        function calculate_initial_x() {
+          var x = 0;
+          for (var i = 0; i < bar_scales.length - 1; i++) {
+            x += (rect_default_width * bar_scales[i]);
+          }
+          return x;
+        }
+
+        var next_bar_x = initial_bar_x;
+        var number_of_bars_added = 0;
+
+        // Called add_bar_before because the z index is defined by the order the polygons are placed - placing right to left
+        function add_bar_before(s, length_multiplier, name, status) {
+          var bar_number = total_bars - number_of_bars_added;
+          var id = "poly" + bar_number;
+          number_of_bars_added++;
+
+          var x1 = next_bar_x;
+          var y1 = initial_bar_y;
+          var x2 = x1;
+          var y2 = y1 + rect_default_height;
+          var x3 = x1 + (rect_default_width * length_multiplier);
+          var y3 = y2;
+          var x4 = x3 + pointer_default_width;
+          var y4 = rect_default_height / 2;
+          var x5 = x3;
+          var y5 = y1;
+
+          //Draw the arrow counter clockwise from top left corner
+          var text_id = "text_" + id;
+          var arrow = s.paper.polygon([x1,y1, x2,y2, x3,y3, x4,y4, x5,y5]).attr({fill: unfilled_arrow_color, id: id, textid:text_id});
+          arrow.mouseover( showtext );
+          arrow.mouseout( hidetext );
+          var text = s.paper.text(50,y2+70,name);
+          text.attr("id", text_id);
+          text.attr("fill", "black");
+          text.attr("font-size", "300%");
+          text.attr("visibility", "hidden");
+          animate_segment(id, status);
+
+          if (bar_number > 1) {
+            next_bar_x -= (rect_default_width * bar_scales[bar_number-2]);
+          }
+        }
+
+        function showtext() {
+          var text = s.select('#' + this.attr("textid"));
+                text.attr("visibility", "visible");
+        }
+        function hidetext() {
+          var text = s.select('#' + this.attr("textid"));
+                text.attr("visibility", "hidden");
+        }
+
+        window.onload = function () {
+          s = Snap("#svg1");
+          for (var i = bar_scales.length; i > 0; i--) {
+            console.log(i);
+            add_bar_before(s, bar_scales[i-1], bar_names[i-1], bar_status[i-1]);
+          }
+        };
+
+      {% endif %} // end pipeline_id
+    </script>
+{% endblock %}
+
+{% block title %}
+  {% if pipeline['pipeline_id'] %}
+    Pipeline {{ pipeline['pipeline_id'] }}
+  {% else %}
+    Pipeline Status
+  {% endif %}
+{% endblock %}
+
+{% block body %}
+  <div class="body-left">
+  <!-- progress bar, link to view pipeline, and launch information -->
+    <div class="progress-bar">
+      <label>Progress <a href="{{ pipeline['pipeline_url'] }}" target="-_blank">View in Ergatis</a></label>
+      <svg id="svg1" viewBox="0 0 2500 300"></svg>
+      {# <p>Launched: {{ pipeline["launch_time"] }}</p> #}
+    </div>
+
+    <!-- Status and elapsed time -->
+    {% if pipeline['pipeline_id'] %}
+    <table class="list-output">
+      <tr class="list-header">
+        <td>Status</td>
+        <td>Launch Time</td>
+        <td>Time Elapsed</td>
+      </tr>
+      <tr class="list-pipeline">
+        <td id="pipe-status">{{ pipeline["status"] }}</td>
+        <td>{{ pipeline["launch_time"] }}</td>
+        <td>{{ pipeline["runtime"] }}</td>
+      </tr>
+    </table>
+    {% endif %} {# /end if pipeline['pipeline_id'] #}
+    <br>
+    <form method="post" action="{{ url_for('main_bp.pipeline_status', pipeline_id=pipeline['pipeline_id']) }}" class="pipe-options">
+      <!--<div><input type="checkbox" id="add_bam" name="add_bam"/> Check to add BAM output to BDBag (warning: can be slow if files are large</div>-->
+      <button type="submit" name="Refresh">Refresh Page</button>
+      <button type="submit" id="create-bdbag" name="create_bdbag"
+        {% if 'reports_zip' in session %}
+        disabled
+        {% endif %}
+      >Create BDBag</button>
+      <button type="submit" id="generate-report" name="generate_report"
+        {% if not 'bdbag_zip' in session or 'reports_zip' in session %}
+        disabled
+        {% endif %}
+        >Generate Report</button>
+      <button type="submit" id="download-bag" name="download_bag"
+        {% if not 'bdbag_zip' in session and not 'reports_zip' in session %}
+        disabled
+        {% endif %}
+      >Download Bag</button>
+    </form>
+  </div>  <!-- end body-left -->
+
+  <div class="body-right">
+  <!-- Contents on right half of page -->
+  {% if pipeline['pipeline_id'] %}
+    <!-- Pipeline component status and elapsed time -->
+    {% if pipeline["components"] %}
+    <!-- lower table -->
+    <table class="list-output" style="float:right">
+      <tr class="list-header">
+        <td>Component</td>
+        <td>Status</td>
+        <td>Time Elapsed</td>
+      </tr>
+      {% for component in pipeline["components"] %}
+      <tr class="list-collapsable" style="display:none">
+        <td>{{ component["name"] }}</td>
+        <td>{{ component["status"] }}</td>
+        <td>{{ component["runtime"] }}</td>
+      </tr>
+      {% endfor %}
+      <tr onclick="javascript:showHide()"><td colspan="4" align="center"><img id="arrow" src="/static/down-arrow.png"/></td></tr>
+    </table>
+    {% endif %} {# /end if pipeline["components"] #}
+  {% endif %} {# /end if pipeline['pipeline_id'] #}
+  </div><!-- end body-right -->
+{% endblock %}

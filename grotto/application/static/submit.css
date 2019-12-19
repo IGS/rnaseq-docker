@@ -1,0 +1,74 @@
+.body-title {
+	margin-bottom: 15px;
+}
+
+.submit-options {
+	border: 1px solid #c5c7cb;
+  border-radius: 5px;
+	background-color: #ffffff;
+	/*padding: 20px;*/
+	font-size: 18px;
+}
+
+.submit-options label {
+	margin-right: 35px;
+}
+
+.value-label {
+  width: 255px;
+	border: 1px solid #c5c7cb;
+	border-radius: 5px;
+	background-color: #f2f7ff;
+  color: #908e8e;
+  display: block;
+	min-height: 25px;
+	word-wrap: break-word;
+}
+
+.submit-options button {
+	font-size: 18px;
+	background-color: #096592;
+	width: 175px;
+	height: 35px;
+	color: #ffffff;
+	margin: 30px 30px 30px 0;
+	border: 0;
+	cursor: pointer;
+	float: right;
+	border-radius: 30px;
+}
+
+.submit-options button:hover {
+	background-color: #00A99D;
+}
+
+.submit-options a{
+  float: right;
+}
+
+label{
+	padding: 5px;
+	font-size: 18px;
+}
+
+#Progress-Bar {
+    width: 506px;
+    background-color: #D4A4DD;
+    height: 15px;
+    margin: 30px;
+    border-radius: 30px;
+    display: flex;
+    overflow: hidden;
+}
+#Bar-Complete {
+    width: 0px;
+    height: 15px;
+    padding: 0px;
+    background-color: green;
+}
+#Bar-Error {
+    width: 0px;
+    height: 15px;
+    padding: 0px;
+    background-color: red;
+}
