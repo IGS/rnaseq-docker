@@ -525,7 +525,8 @@ def submit():
         output_dir = os.path.join(session['pipeline_options'].get('repository_root'),  "pipelines/")
         if not os.path.isdir(output_dir):
             os.makedirs(output_dir)
-        os.chmod(output_dir, 0o777)
+            os.chmod(output_dir, 0o777)
+
         # flash(output_dir)
         app.logger.debug("Output directory : " + output_dir)
 
