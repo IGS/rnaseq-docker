@@ -1,0 +1,56 @@
+version: '3'
+
+networks:
+  ergatis:
+
+volumes:
+  projects_vol:
+  scratch_vol:
+
+services:
+
+# Container that stores ergatis repo root data.
+# Stopping other contaners will not cause loss in pipeline data, meaning pipelines can be resumed later
+  data:
+    image: adkinsrs/ergatis-data
+    tty: true
+    volumes:
+      - projects_vol:/opt/projects/repository
+      - scratch_vol:/usr/local/scratch
+      - /home/ubuntu/input_data:/mnt/input_data
+
+# Container responsible for running the pipeline
+
+  ergatis:
+    command: ["-D", "FOREGROUND"]
+    environment:
+      - REPO_ROOT=/opt/projects/repository
+      - TEMPLATES=/opt/ergatis/pipeline_templates/
+    entrypoint:
+      - apache2
+    expose:
+      - "22"
+    image: adkinsrs/rnaseq:latest
+    networks:
+      - ergatis
+    ports:
+      - "8080:80"
+    restart: always
+    volumes:
+      - projects_vol:/opt/projects/repository
+      - scratch_vol:/usr/local/scratch
+      - /home/ubuntu/input_data:/mnt/input_data
+
+# Container with the pipeline configuration UI 
+  grotto:
+    environment:
+      - DOCKER_HOST=100.24.120.187
+    image: adkinsrs/grotto:devel
+    networks:
+      - ergatis
+    ports:
+      - "5000:5000"
+    volumes:
+      - projects_vol:/opt/projects/repository
+      - scratch_vol:/usr/local/scratch
+      - /home/ubuntu/input_data:/mnt/input_data

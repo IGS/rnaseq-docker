@@ -15,6 +15,11 @@
         <a href="/help">help</a>
         <a href="/sample_info_file">create_pipeline</a>
         <a href="/recent_pipelines">recent_pipelines</a>
+        {% if not config.DOCKER %}
+        <span>|</span>
+        <span class="logged-user">[{{ current_user.get_id() }}]</span>
+        <a href="/logout">logout</a>
+        {% endif %}
       </nav>
     </div><!-- end body-title -->
 
@@ -42,7 +47,7 @@
     {% endwith %}
     <main>
 
-        
+
       {% block body %}{% endblock %}</main>
     <p>Warning: Do not hit the BACK button in the browser</p>
   </div><!-- end body-wrapper -->

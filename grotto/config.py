@@ -14,20 +14,21 @@ class Config:
     # Max number of recent pipelines to keep
     MAX_RECENT_PIPELINES = 10
 
+    UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER')
+    LOG_FILE = os.environ.get('LOG_FILE')
+    PIPELINE_FLATFILE = os.environ.get('PIPELINE_FLATFILE')
+    # Location of the Ergatis package containing scripts and components
+    PACKAGE_DIR = os.environ.get('PACKAGE_DIR')
+    ERGATIS_INI = os.environ.get('ERGATIS_INI')
+    GENERATORS_DIR = os.environ.get('GENERATORS_DIR')
+    ERGATIS_URL = os.environ.get('ERGATIS_URL')
+    BDBAG_OUTPATH = os.environ.get('BDBAG_OUTPATH')
+    REPORTS_OUTPATH = os.environ.get('REPORTS_OUTPATH')
+
 # Docker-specific configurations
 
 class DockerConfig(Config):
     DOCKER = True
-    UPLOAD_FOLDER = '/tmp'
-    LOG_FILE = '/tmp/log.txt'
-    PIPELINE_FLATFILE = '/tmp/pipeline_info.txt'
-    # Location of the Ergatis package containing scripts and components
-    PACKAGE_DIR = '/opt/ergatis/'
-    ERGATIS_INI = '/var/www/html/ergatis/cgi/ergatis.ini'
-    GENERATORS_DIR = '/opt/'
-    ERGATIS_URL = 'http://ergatis:80/ergatis/cgi'
-    BDBAG_OUTPATH = '/tmp/bdbag'
-    REPORTS_OUTPATH = '/tmp/reports'
 
 class DockerProdConfig(DockerConfig):
     DEBUG = False
@@ -36,3 +37,19 @@ class DockerProdConfig(DockerConfig):
 class DockerDevConfig(DockerConfig):
     DEBUG = True
     TESTING = True
+
+# IGS-specific configurations
+
+class InternalConfig(Config):
+    DOCKER = False
+    LDAP_SERVICE = os.environ.get('LDAP_SERVICE')
+    LDAP_REALM = os.environ.get('LDAP_REALM')
+
+class InternalProdConfig(InternalConfig):
+    DEBUG = False
+    TESTING = False
+
+class InternalDevConfig(InternalConfig):
+    DEBUG = True
+    TESTING = True
+    LOG_FILE = LOG_FILE.replace("grotto", "grotto-staging")

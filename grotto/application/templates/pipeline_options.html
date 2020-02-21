@@ -69,9 +69,17 @@
           <div class="tooltip"><a href="#">?</a><span class="tooltiptext-left">Path to mapping file containing contigs to gene IDs (used in report creation)</span></div>
         </div>
         <div class="form-line">
-          <span class="form-label"><label for="repository-root">Repository Root</label></span>
+          <span class="form-label"><label for="repository-root">Repository Root
+            {% if not config.DOCKER %}
+              <a href="/static/RepoRootSetUp.pdf" download>
+              [Setup Instructions]
+              </a>
+            {% endif %}
+          </label></span>
           <span class="form-input"><input type="text" name="repository_root" id="repository-root"
+            {% if config.DOCKER %}
               value="/opt/projects/repository"
+            {% endif %}
             {% if 'pipeline_options' in session %}
               value="{{ session['pipeline_options']['repository_root'] }}"
             {% endif %}
@@ -81,7 +89,9 @@
         <div class="form-line">
           <span class="form-label"><label for="project-code">Project ID</label></span>
           <span class="form-input"><input type="text" name="project_code" id="project-code"
+            {% if config.DOCKER %}
               value="Docker"
+            {% endif %}
             {% if 'pipeline_options' in session %}
               value="{{ session['pipeline_options']['project_code'] }}"
             {% endif %}

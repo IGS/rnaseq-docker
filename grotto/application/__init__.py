@@ -19,11 +19,25 @@ def create_app():
     # Initialize application
     app = Flask(__name__, instance_relative_config=False)
 
+    # Check if running in Docker (assumes on UNIX filesystem)
+    # https://stackoverflow.com/questions/52580008/how-does-java-application-know-it-is-running-within-a-docker-container
+    in_docker = False
+    with open("/proc/1/cgroup", "r") as fh:
+        if "/docker" in fh.read():
+            in_docker = True
+
     # change ENV by running "export FLASK_ENV=development/production"
     if app.config["ENV"] == "production":
-        app.config.from_object('config.DockerProdConfig')
+        if in_docker:
+            app.config.from_object('config.DockerProdConfig')
+        else:
+            app.config.from_object('config.InternalProdConfig')
     else:
-        app.config.from_object('config.DockerDevConfig')
+        if in_docker:
+            app.config.from_object('config.DockerDevConfig')
+        else:
+            app.config.from_object('config.InternalDevConfig')
+
     app.secret_key = app.config['SECRET_KEY']
 
     #print(app.config)

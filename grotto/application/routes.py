@@ -286,7 +286,8 @@ def pipeline_options():
         result['sorted'] = str(request.form['sorted1'])
 
         session['pipeline_options'] = result
-        session['pipeline_options']['repository_root'] = "/opt/projects/repository"
+        if app.config['DOCKER']:
+            session['pipeline_options']['repository_root'] = "/opt/projects/repository"
 
         # If no mapping file was provided, make it a default value
         if not len(session['pipeline_options'].get('mapping_file')):
@@ -518,7 +519,9 @@ def submit():
         ### Start building the argument for the Perl script ###
         cmd_args = ["/usr/bin/perl"]
         script_dir = os.path.join(app.config['PACKAGE_DIR'], 'bin')
-        templates_dir = os.path.join(app.config['PACKAGE_DIR'],'pipeline_templates')
+        templates_dir = os.path.join(app.config['PACKAGE_DIR'],'global_pipeline_templates')
+        if app.config['DOCKER']:
+            templates_dir = os.path.join(app.config['PACKAGE_DIR'],'pipeline_templates')
         ergatis_ini = app.config['ERGATIS_INI']
 
         # Create output dir to place pipeline-relevant files, if it does not exist
@@ -562,6 +565,11 @@ def submit():
         # Lastly, assign all variable option flags
         pipeline_args = helpers.parse_pipeline_options_flags()
         cmd_args.extend(pipeline_args)
+
+        # The perl script command should be built at this point
+        # Append 'sudo' stuff in front if running internally.  Docker image does not have 'sudo'
+        if not app.config['DOCKER']:
+            cmd_args[:0] = ["sudo", "-u", user_name]
 
         pipeline_opts_keys = []
         if session.get('pipeline_options'):   # should always be true
