@@ -7,7 +7,7 @@ import os
 class Config:
 
     SECRET_KEY = os.environ.get('SECRET_KEY')
-    SESSION_COOKIE_NAME = os.environ.get('SESSION_COOKIE_NAME')
+    SESSION_COOKIE_NAME = "grotto"
     SESSION_TYPE = "filesystem"
     SESSION_PERMANENT = False
 
