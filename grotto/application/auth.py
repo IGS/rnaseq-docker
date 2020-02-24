@@ -49,9 +49,7 @@ def login():
 
 @auth_bp.route('/logout')
 def logout():
-    #remove_temp_files(CURRENT_DIR)
     logout_user()
-    #session.clear()
     return redirect(url_for('auth_bp.login'))
 
 @login_manager.user_loader
