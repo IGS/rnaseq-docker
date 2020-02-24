@@ -1,1 +1,2 @@
 * On the pipeline_status page, the table grows too large when uncollapsed
+* Eventually change forms to use WTForms (flask-wtf)
