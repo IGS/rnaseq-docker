@@ -45,7 +45,9 @@ def help():
 def sample_info_file():
     """ Handles various ways to create the sample_info_file, and also performs validation """
 
-    helpers.freeze_localtime()
+    if not session.get("uniq_file_prefix"):
+        helpers.freeze_localtime()
+        session["uniq_file_prefix"] = helpers.generate_unique_filename(current_user.get_id(), session.get('localtime'))
 
     if request.method == 'POST':
         result = []
@@ -84,8 +86,6 @@ def sample_info_file():
                 _sif_base.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 _sif_location = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
-            session['sif_location'] = _sif_location
-
             # Now ready to parse uploaded sample info file
             with open(_sif_location) as sif:
                 for line in sif:
@@ -121,34 +121,25 @@ def sample_info_file():
             data = SIF_entry(curr_row, _sample_id, _group_id, _file_1, _file_2)
             result.append(data.serialize())
 
-            # Check of each filed is UNIX readable
-            if not helpers.unix_readable(_sample_id):
-                error.append('Row ' + str(curr_row) + ': Sample Id value \'' +
-                            _sample_id + '\' entered in row '+str(curr_row)+' is not UNIX readable.')
-                error_cell.append('input_r'+str(curr_row)+'_sample_id')
-            if not helpers.unix_readable(_group_id):
-                error.append('Row ' + str(curr_row) + ': Group Id value \'' +
-                            _group_id+'\' entered in row '+str(curr_row)+' is not UNIX readable.')
-                error_cell.append('input_r'+str(curr_row)+'_group_id')
-            if not helpers.unix_readable(_file_1):
-                error.append('Row ' + str(curr_row) + ': File 1 name \'' +
-                            _file_1+'\' entered in row '+str(curr_row)+' is not UNIX readable.')
-                error_cell.append('input_r'+str(curr_row)+'_file_1')
-            if not helpers.unix_readable(_file_2):
-                error.append('Row ' + str(curr_row) + ': File 2 name \'' +
-                            _file_2+'\' entered in row '+str(curr_row)+' is not UNIX readable.')
-                error_cell.append('input_r'+str(curr_row)+'_file_2')
+            sample_fields = {
+                "Sample ID": {"label":"_sample_id", "result":_sample_id},
+                "Group ID":{"label":"_group_id", "result":_group_id},
+                "File 1":{"label":"_file_1", "result":_file_1},
+                "File_2":{"label":"_file_2", "result":_file_2},
+            }
+
+            for key, val in sample_fields:
+                # Check of each filed is UNIX readable
+                if not helpers.unix_readable(val):
+                    error.append('Row ' + str(curr_row) + ': ' + key + ' value "' +
+                                val["result"] + '" entered in row '+str(curr_row)+' is not UNIX readable.')
+                    error_cell.append('input_r'+str(curr_row) + val["label"])
 
             # Check if all required field are non-empty
-            if _sample_id == '':
-                error.append('Row ' + str(curr_row) + ': Sample ID is required.')
-                error_cell.append('input_r'+str(curr_row)+'_sample_id')
-            if _group_id == '':
-                error.append('Row ' + str(curr_row) + ': Group ID is required.')
-                error_cell.append('input_r'+str(curr_row)+'_group_id')
-            if _file_1 == '':
-                error.append('Row ' + str(curr_row) + ': File 1 is required.')
-                error_cell.append('input_r'+str(curr_row)+'_file_1')
+            for key in ["Sample ID", "Group ID", "File 1"]:
+                if sample_fields[key]["result"] == '':
+                    error.append('Row ' + str(curr_row) + ': ' + key + ' is required.')
+                    error_cell.append('input_r'+str(curr_row) + sample_fields[key]["label"])
 
             # Chcek if each sample id is unique within the submission
             if _sample_id in sample_id_list:
@@ -177,23 +168,17 @@ def sample_info_file():
             session.pop('error_cell', None)
 
         # flash(result)
-        file_base = helpers.generate_unique_filename(current_user.get_id(), session.get('localtime'))
-        temp_info = file_base + ".temp.info"
-        temp_info_file_location = os.path.join(CURRENT_DIR, temp_info)
+        temp_info = session.get("uniq_file_prefix") + ".temp.info"
+        session['sample_info_file'] = os.path.join(CURRENT_DIR, temp_info)
 
         # Write tmp sample_info file
-        try:
-            os.remove(temp_info_file_location)
-        except OSError:
-            pass
-        op_info_file = open(temp_info_file_location, 'w+')
-        for elem in result:
-            op_info_file.write(elem['sample_id']+'\t'+elem['group_id']+'\t'+elem['file_1'])
-            if not elem['file_2']:
-                op_info_file.write('\n')
-            else:
-                op_info_file.write('\t'+elem['file_2']+'\n')
-        op_info_file.close()
+        with open(session.get('sample_info_file'), 'w') as sample_fh:
+            for elem in result:
+                sample_fh.write(elem['sample_id']+'\t'+elem['group_id']+'\t'+elem['file_1'])
+                if not elem['file_2']:
+                    sample_fh.write('\n')
+                else:
+                    sample_fh.write('\t'+elem['file_2']+'\n')
 
         if 'edit_sif' not in session:
             session['edit_sif'] = 0
@@ -341,12 +326,11 @@ def config_file_form():
 
     component_list = helpers.determine_components()
 
-    file_base = helpers.generate_unique_filename(current_user.get_id(), session.get('localtime'))
-    temp_config = file_base + ".temp.config"
-
     if request.method == 'POST':
         app.logger.debug('In /config_file_form - POST')
-        temp_config_file_location = os.path.join(CURRENT_DIR, temp_config)
+
+        temp_config = session.get("uniq_file_prefix") + ".temp.config"
+        session["config_file"] = os.path.join(CURRENT_DIR, temp_config)
 
         ### 1) If pre-made config file was uploaded, parse and validate
         if 'Upload' in request.form:
@@ -382,13 +366,11 @@ def config_file_form():
             # All our uploaded file validation steps passed
             # Reload page, filling in config fields in form
             filename = secure_filename(_cff_base.filename)
-            _cff_base.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             _cff_location = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            shutil.copyfile(_cff_location, temp_config_file_location)
-            result = helpers.create_config_hash_from_template(component_list, temp_config)
+            shutil.copyfile(_cff_location, session.get("config_file"))
+            result = helpers.create_config_hash_from_template(component_list, session.get("config_file"))
             if result is None:
                 return render_template('config_file_form.html', result=result)
-
 
             # Ensure all required components have a config file section
             missing_components = [component for component in component_list if component not in result.keys()]
@@ -400,27 +382,27 @@ def config_file_form():
                 return render_template('config_file_form.html', result=result)
 
             session['cff_location'] = _cff_location
-            session['cff_base'] = os.path.basename(session.get('cff_location'))
             return render_template('config_file_form.html', result=result)
         # end Upload if
 
         ### 2) Hit 'Next' on template section page with uploaded file.
         if session.get('cff_location'):
             # This assumes the user's uploaded form is correct (no required_fields check)
+            session.pop('cff_location', None)
             return redirect(url_for('main_bp.submit'))
 
         ### 3) Config fields were manually filled in, and "Next" was clicked.
 
         # Get fields, either from Prok/Euk template, or from existing temp.config file
-        if os.path.exists(temp_config_file_location):
+        if os.path.exists(session.get("config_file")):
             # Only reach here if required param validation failed
             app.logger.debug("Reading from temp config file. " +
                             "Must have failed required param validation or hit 'Back' in browser.")
             try:
-                result = helpers.create_config_hash_from_template(component_list, temp_config)
+                result = helpers.create_config_hash_from_template(component_list, session.get("config_file"))
             except KeyError as e:
                 # Safeguarding against accidental removal of the file since the script removes it at one point
-                err = "The {} file could not be read.  Resetting page.".format(temp_config)
+                err = "The {} file could not be read.  Resetting page.".format(session.get("config_file"))
                 app.logger.error(err)
                 app.logger.error(e)
                 app.logger.error(sys.exc_info()[0])
@@ -432,20 +414,19 @@ def config_file_form():
             result = helpers.create_config_hash_from_template(component_list)
 
         # Write fields to temporary pipeline config file
-        op_conf_file = open(temp_config_file_location, 'w+')
-        for component in result:
-            if not component:
-                continue
-            op_conf_file.write('['+component+']\n')
-            for i in range(0, len(result[component])):
-                _key = result[component][str(i)]['key']
-                _value = str(request.form[component + '_' + _key])
-                _comment = result[component][str(i)]['comment']
-                result[component][str(i)]['value'] = _value
-                op_conf_file.write(';; ' + _comment + '\n')
-                op_conf_file.write('$;' + _key + '$; = ' + _value + '\n')
-            op_conf_file.write('\n')
-        op_conf_file.close()
+        with open(session.get("config_file"), 'w') as config_fh:
+            for component in result:
+                if not component:
+                    continue
+                config_fh.write('['+component+']\n')
+                for i in range(0, len(result[component])):
+                    _key = result[component][str(i)]['key']
+                    _value = str(request.form[component + '_' + _key])
+                    _comment = result[component][str(i)]['comment']
+                    result[component][str(i)]['value'] = _value
+                    config_fh.write(';; ' + _comment + '\n')
+                    config_fh.write('$;' + _key + '$; = ' + _value + '\n')
+                config_fh.write('\n')
 
         # Verify all required config fields have a value
         invalid_components = []
@@ -457,7 +438,7 @@ def config_file_form():
         if invalid_comp_set:
             for comp in invalid_comp_set:
                 flash('Required fields in section \''+comp+'\' cannot be left empty.')
-            result = helpers.create_config_hash_from_template(component_list, temp_config)
+            result = helpers.create_config_hash_from_template(component_list, session.get("config_file"))
             return render_template('config_file_form.html', result=result)
 
         # If config data validated, go to next page
@@ -468,10 +449,10 @@ def config_file_form():
         result = dict()
         if session.get('edit_cff') == 1:
             try:
-                result = helpers.create_config_hash_from_template(component_list, temp_config)
+                result = helpers.create_config_hash_from_template(component_list, session.get("config_file"))
             except Exception as e:
                 # Safeguarding against accidental removal of the file since the script removes it at one point
-                err = "The {} file could not be read.  Resetting page.".format(temp_config)
+                err = "The {} file could not be read.  Resetting page.".format(session.get("config_file"))
                 app.logger.error(err)
                 app.logger.error(e)
                 app.logger.error(sys.exc_info()[0])
@@ -494,22 +475,15 @@ def submit():
     session['edit_sif'] = 1
     session['edit_po'] = 1
 
-    # Pop uploaded files in case page needs to be accessed again, which could throw off route paths
-    session.pop('sif_location', None)
-    session.pop('cff_location', None)
-    session.pop('cff_base', None)
-
     user_name = current_user.get_id()
-    file_base = helpers.generate_unique_filename(user_name, session.get('localtime'))
-    session['file_base'] = file_base
-    temp_config = file_base + ".temp.config"
-    temp_info = file_base + ".temp.info"
+    temp_config = session.get("uniq_file_prefix") + ".temp.config"
+    temp_info = session.get("uniq_file_prefix") + ".temp.info"
 
-    result, _ = helpers.read_config_file(temp_config)
+    result, _ = helpers.read_config_file(session.get("config_file"))
 
     # Copy files to 'static' directory, where they can be downloaded
-    shutil.copyfile(os.path.join(CURRENT_DIR, temp_config), os.path.join(CURRENT_DIR, "static/tmp", temp_config))
-    shutil.copyfile(os.path.join(CURRENT_DIR, temp_info), os.path.join(CURRENT_DIR, "static/tmp", temp_info))
+    shutil.copyfile(session.get("config_file"), os.path.join(CURRENT_DIR, "static/tmp", temp_config))
+    shutil.copyfile(session.get("sample_info_file"), os.path.join(CURRENT_DIR, "static/tmp", temp_info))
 
     if request.method == 'POST':
         app.logger.debug('In /submit - POST')
@@ -536,11 +510,11 @@ def submit():
         info_file_name = input_dir_name+'_sample.info'
         info_file = os.path.join(output_dir, info_file_name)
         session['sample_info_file'] = info_file
-        shutil.copyfile(os.path.join(CURRENT_DIR, temp_info), info_file)
+        shutil.copyfile(session.get("sample_info_file"), info_file)
 
         config_file_name = input_dir_name+'_template.config'
         config_file = os.path.join(output_dir, config_file_name)
-        shutil.copyfile(os.path.join(CURRENT_DIR, temp_config), config_file)
+        shutil.copyfile(session.get("config_file"), config_file)
 
         script_path = os.path.join(script_dir, "create_prok_rnaseq_pipeline_config.pl")
         template = os.path.join(templates_dir, "Prokaryotic_RNA_Seq_Analysis")
@@ -593,7 +567,7 @@ def submit():
             pipeline.sample_info = info_file
             pipeline.config_file = config_file
             helpers.append_to_pipeline_flatfile(pipeline, info_file, config_file)
-            helpers.remove_temp_files(CURRENT_DIR)
+            helpers.remove_temp_files()
             helpers.clear_submitted_pipeline_session_values()
             return redirect(url_for('main_bp.pipeline_status', pipeline_id=pipeline.pipeline_id))
 

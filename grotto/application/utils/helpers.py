@@ -68,7 +68,10 @@ def clear_submitted_pipeline_session_values():
     session.pop('pipeline_type', None)
     session.pop('mapping_file', None)
     session.pop('required_fields', None)
-    session.pop('file_base', None)
+    session.pop('uniq_file_prefix', None)
+    session.pop('sample_info_file', None)
+    session.pop('config_file', None)
+    session.pop('pipeline_options_file', None)
     session.pop('sample_info_json', None)
     session.pop('localtime', None)
     session.pop('bdbag_zip', None)
@@ -520,23 +523,17 @@ def read_config_file(file_name, component_list=None):
 
     return result, required_fields
 
-def remove_temp_files(dirname):
+def remove_temp_files():
     app.logger.debug("Removing temp.config and temp.info from app directory")
-    file_base = generate_unique_filename(current_user.get_id(), session.get('localtime'))
-    temp_config = file_base + ".temp.config"
-    temp_info = file_base + ".temp.info"
-    # Remove temporary config file.
-    temp_config_file_location = os.path.join(dirname, temp_config)
-    try:
-        os.remove(temp_config_file_location)
-    except OSError:
-        pass
-    # Remove temporary info file.
-    temp_info_file_location = os.path.join(dirname, temp_info)
-    try:
-        os.remove(temp_info_file_location)
-    except OSError:
-        pass
+    for file in ["config_file", "sample_info_file"]:
+        try:
+            os.remove(session.get(file))
+        except OSError:
+            pass
+        try:
+            os.remove(session.get(file))
+        except OSError:
+            pass
     # TODO: potentially remove /static/tmp tempfiles as well (though may be nice to have for debugging)
 
 def unix_readable(field):
@@ -583,62 +580,58 @@ def validate_repo_root(repo_root):
 
 def write_pipeline_options(result):
     """ Store chosen pipeline options into a file """
-    file_base = generate_unique_filename(current_user.get_id(), session.get('localtime'))
-    pipeopts = file_base + ".pipeline_options.txt"
-    pipeline_options_file_location = os.path.join(PARENT_DIR, "static/tmp", pipeopts)
+    pipeopts = session.get("uniq_file_prefix") + ".pipeline_options.txt"
+    session["pipeline_options_file"] = os.path.join(PARENT_DIR, "static/tmp", pipeopts)
 
-    try:
-        os.remove(pipeline_options_file_location)
-    except OSError:
-        pass
-    pipeline_options_file = open(pipeline_options_file_location, 'a+')
-    pipeline_options_file.write('Reference\t' + str(result['reference']) + '\n')
-    pipeline_options_file.write('GTF\t' + str(result['gtf']) + '\n')
-    pipeline_options_file.write('Repository Root\t' + str(result['repository_root']) + '\n')
-    pipeline_options_file.write('Project Code\t' + str(result['project_code']) + '\n')
-    pipeline_options_file.write('Mapping File\t' + str(result['mapping_file']) + '\n')
+    # TODO: Rewrite to allow it to be reused
 
-    pipeline_options_file.write('Annotation Format\t' + str(result['annotation_format']) + '\n')
-    if 'tophat_legacy' in result and str(result['tophat_legacy']) == 'on':
-        pipeline_options_file.write('Legacy Tophat Pipeline\t' + '\n')
-    if 'cufflinks_legacy' in result and str(result['cufflinks_legacy']) == 'on':
-        pipeline_options_file.write('Legacy Cufflinks Pipeline\t' + '\n')
-    if 'build_indexes' in result and str(result['build_indexes']) == 'on':
-        pipeline_options_file.write('Build Indexes\t' + '\n')
-    if 'quality_stats' in result and str(result['quality_stats']) == 'on':
-        pipeline_options_file.write('Quality Stats\t' + '\n')
-    if 'quality_trimming' in result and str(result['quality_trimming']) == 'on':
-        pipeline_options_file.write('Quality Trimming\t' + '\n')
-    if 'alignment' in result and str(result['alignment']) == 'on':
-        pipeline_options_file.write('Alignment\t' + '\n')
-    if 'visualization' in result and str(result['visualization']) == 'on':
-        pipeline_options_file.write('Visualization\t' + '\n')
-    if 'rpkm_analysis' in result and str(result['rpkm_analysis']) == 'on':
-        pipeline_options_file.write('RPKM Analysis\t' + '\n')
-    if 'differential_gene_expression' in result and str(result['differential_gene_expression']) == 'on':
-        pipeline_options_file.write('Differential Gene Expression\t' + '\n')
+    with open(session.get("pipeline_options_file"), 'w') as pipe_fh:
+        pipe_fh.write('Reference\t' + str(result['reference']) + '\n')
+        pipe_fh.write('GTF\t' + str(result['gtf']) + '\n')
+        pipe_fh.write('Repository Root\t' + str(result['repository_root']) + '\n')
+        pipe_fh.write('Project Code\t' + str(result['project_code']) + '\n')
+        pipe_fh.write('Mapping File\t' + str(result['mapping_file']) + '\n')
+
+        pipe_fh.write('Annotation Format\t' + str(result['annotation_format']) + '\n')
+        if 'tophat_legacy' in result and str(result['tophat_legacy']) == 'on':
+            pipe_fh.write('Legacy Tophat Pipeline\t' + '\n')
+        if 'cufflinks_legacy' in result and str(result['cufflinks_legacy']) == 'on':
+            pipe_fh.write('Legacy Cufflinks Pipeline\t' + '\n')
+        if 'build_indexes' in result and str(result['build_indexes']) == 'on':
+            pipe_fh.write('Build Indexes\t' + '\n')
+        if 'quality_stats' in result and str(result['quality_stats']) == 'on':
+            pipe_fh.write('Quality Stats\t' + '\n')
+        if 'quality_trimming' in result and str(result['quality_trimming']) == 'on':
+            pipe_fh.write('Quality Trimming\t' + '\n')
+        if 'alignment' in result and str(result['alignment']) == 'on':
+            pipe_fh.write('Alignment\t' + '\n')
+        if 'visualization' in result and str(result['visualization']) == 'on':
+            pipe_fh.write('Visualization\t' + '\n')
+        if 'rpkm_analysis' in result and str(result['rpkm_analysis']) == 'on':
+            pipe_fh.write('RPKM Analysis\t' + '\n')
+        if 'differential_gene_expression' in result and str(result['differential_gene_expression']) == 'on':
+            pipe_fh.write('Differential Gene Expression\t' + '\n')
+            if 'alignment' in result and str(result['alignment']) == 'off':
+                if 'count' in result and str(result['count']) == 'on':
+                    pipe_fh.write('Count\t' + '\n')
+        if 'isoform_analysis' in result and str(result['isoform_analysis']) == 'on':
+            pipe_fh.write('Isoform Analysis\t' + '\n')
+            if 'include_novel' in result and str(result['include_novel']) == 'on':
+                pipe_fh.write('Include Novel\t' + '\n')
+        if 'differential_isoform_analysis' in result and str(result['differential_isoform_analysis']) == 'on':
+            pipe_fh.write('Differential Isoform Analysis\t' + '\n')
+            if 'use_ref_gtf' in result and str(result['use_ref_gtf']) == 'on':
+                pipe_fh.write('Use reference GTF/GFF3 in Cuffdiff\t' + '\n')
+
+        if 'build_indexes' in result and str(result['build_indexes']) == 'off':
+            if 'index_file' in result and str(result['index_file']) != '':
+                pipe_fh.write('Reference Index File\t' + str(result['index_file']) + '\n')
+
         if 'alignment' in result and str(result['alignment']) == 'off':
-            if 'count' in result and str(result['count']) == 'on':
-                pipeline_options_file.write('Count\t' + '\n')
-    if 'isoform_analysis' in result and str(result['isoform_analysis']) == 'on':
-        pipeline_options_file.write('Isoform Analysis\t' + '\n')
-        if 'include_novel' in result and str(result['include_novel']) == 'on':
-            pipeline_options_file.write('Include Novel\t' + '\n')
-    if 'differential_isoform_analysis' in result and str(result['differential_isoform_analysis']) == 'on':
-        pipeline_options_file.write('Differential Isoform Analysis\t' + '\n')
-        if 'use_ref_gtf' in result and str(result['use_ref_gtf']) == 'on':
-            pipeline_options_file.write('Use reference GTF/GFF3 in Cuffdiff\t' + '\n')
+            if 'file_type' in result and str(result['file_type']) != '':
+                pipe_fh.write('File Type\t' + str(result['file_type']) + '\n')
+            if 'sorted' in result and str(result['sorted']) != '':
+                pipe_fh.write('Sorted\t' + str(result['sorted']) + '\n')
 
-    if 'build_indexes' in result and str(result['build_indexes']) == 'off':
-        if 'index_file' in result and str(result['index_file']) != '':
-            pipeline_options_file.write('Reference Index File\t' + str(result['index_file']) + '\n')
-
-    if 'alignment' in result and str(result['alignment']) == 'off':
-        if 'file_type' in result and str(result['file_type']) != '':
-            pipeline_options_file.write('File Type\t' + str(result['file_type']) + '\n')
-        if 'sorted' in result and str(result['sorted']) != '':
-            pipeline_options_file.write('Sorted\t' + str(result['sorted']) + '\n')
-
-    if 'comparison_groups' in result and str(result['comparison_groups']) != '':
-        pipeline_options_file.write('Comparison Groups\t' + str(result['comparison_groups']) + '\n')
-    pipeline_options_file.close()
+        if 'comparison_groups' in result and str(result['comparison_groups']) != '':
+            pipe_fh.write('Comparison Groups\t' + str(result['comparison_groups']) + '\n')
