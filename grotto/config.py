@@ -52,4 +52,5 @@ class InternalProdConfig(InternalConfig):
 class InternalDevConfig(InternalConfig):
     DEBUG = True
     TESTING = True
+    LOG_FILE = os.environ.get('LOG_FILE')
     LOG_FILE = LOG_FILE.replace("grotto", "grotto-staging")
