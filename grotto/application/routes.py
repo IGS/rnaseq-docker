@@ -93,7 +93,7 @@ def sample_info_file():
                     if line.startswith('#'):
                         continue
                     values = line.split()
-                    # flash(values)
+                    #flash(values)
                     # It's possible for the user to pass in just 1 file.
                     if len(values) < 4:
                         values.append('')
@@ -128,7 +128,7 @@ def sample_info_file():
                 "File_2":{"label":"_file_2", "result":_file_2},
             }
 
-            for key, val in sample_fields:
+            for key, val in sample_fields.items():
                 # Check of each filed is UNIX readable
                 if not helpers.unix_readable(val):
                     error.append('Row ' + str(curr_row) + ': ' + key + ' value "' +
