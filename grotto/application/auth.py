@@ -17,13 +17,13 @@ auth_bp = Blueprint('auth_bp', __name__,
 def login():
     """ Handles the login process. Also removes tmp files """
 
-    # Bypass Login screen if user is logged in
-    if current_user.is_authenticated:
-        return redirect(url_for('main_bp.sample_info_file'))
-
     # Bypass login if running in Docker
     if app.config["DOCKER"]:
         login_docker()
+
+    # Bypass Login screen if user is logged in
+    if current_user.is_authenticated:
+        return redirect(url_for('main_bp.sample_info_file'))
 
     # POST
     if request.method == 'POST':
