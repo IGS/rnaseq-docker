@@ -366,6 +366,7 @@ def config_file_form():
             # All our uploaded file validation steps passed
             # Reload page, filling in config fields in form
             filename = secure_filename(_cff_base.filename)
+            _cff_base.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             _cff_location = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             shutil.copyfile(_cff_location, session.get("config_file"))
             result = helpers.create_config_hash_from_template(component_list, session.get("config_file"))
