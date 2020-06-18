@@ -3,6 +3,10 @@
 # Note: All prop keys must be in caps -- it's a flask thing
 
 import os
+from dotenv import load_dotenv
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(os.path.join(basedir, '.env'))
 
 class Config:
 
