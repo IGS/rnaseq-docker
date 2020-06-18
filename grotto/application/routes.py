@@ -510,8 +510,9 @@ def submit():
 
         info_file_name = input_dir_name+'_sample.info'
         info_file = os.path.join(output_dir, info_file_name)
-        session['sample_info_file'] = info_file
         shutil.copyfile(session.get("sample_info_file"), info_file)
+        session['sample_info_file'] = info_file
+
 
         config_file_name = input_dir_name+'_template.config'
         config_file = os.path.join(output_dir, config_file_name)
