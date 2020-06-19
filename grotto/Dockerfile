@@ -20,7 +20,23 @@ EXPOSE 5000
 
 ARG REPORT_DOWNLOAD_URL=https://github.com/IGS/report-generator.git
 
+# Get R packages and pandoc (right now the libicuXXX files are not copying over for some reason so copy the whole directory
+#COPY --from=build /usr/lib /usr/lib
+COPY --from=build /usr/lib/R /usr/lib/R
+COPY --from=build /usr/bin/pandoc /usr/bin/pandoc
+COPY --from=build /usr/share/pandoc /usr/share/pandoc
+COPY --from=build /usr/lib/libgmp.so.10 /usr/lib/libgmp.so.10
+#COPY --from=build /usr/lib/libicudata.so.60 /usr/lib/libicudata.so.60
+#COPY --from=build /usr/lib/libreadline.so.8 /usr/lib/libreadline.so.8
+#COPY --from=build /usr/lib/libicuuc.so.60.2 /usr/lib/libicuuc.so.60
+#COPY --from=build /usr/lib/libicui18n.so.60.2 /usr/lib/libicui18n.so.60
+COPY --from=build /usr/lib/R/library/Rcpp/libs/Rcpp.so /usr/lib/R/library/Rcpp/libs/Rcpp.so
+
 RUN apk --update add --no-cache \
+  #expat-dev \
+  #make \
+  #gcc \
+  #g++ \
   krb5-dev \
   python3-dev \
   py3-setuptools \
@@ -42,17 +58,6 @@ RUN apk --update add --no-cache \
 RUN pip3 install --upgrade pip \
 # Flask version in alpine packages is <1.0.
   && pip3 install --no-cache-dir bagit bdbag python-dotenv tzlocal flask flask_login flask_session pandas kerberos
-# Get R packages and pandoc
-COPY --from=build /usr/lib/R /usr/lib/R
-COPY --from=build /usr/bin/pandoc /usr/bin/pandoc
-COPY --from=build /usr/share/pandoc /usr/share/pandoc
-COPY --from=build /usr/lib/libgmp.so.10 /usr/lib/libgmp.so.10
-COPY --from=build /usr/lib/libicudata.so.64 /usr/lib/libicudata.so.64
-COPY --from=build /usr/lib/libreadline.so.8 /usr/lib/libreadline.so.8
-COPY --from=build /usr/lib/libicuuc.so.64 /usr/lib/libicuuc.so.64
-COPY --from=build /usr/lib/libicui18n.so.64 /usr/lib/libicui18n.so.64
-COPY --from=build /usr/lib/R/library/Rcpp/libs/Rcpp.so /usr/lib/R/library/Rcpp/libs/Rcpp.so
-
 
 WORKDIR /usr/src
 
