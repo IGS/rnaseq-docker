@@ -582,7 +582,7 @@ def pipeline_status(pipeline_id):
     ''' Monitor current status of the running pipeline '''
     #app.logger.debug('Entered /pipeline_status - ' + request.method)
 
-    pipeline = ''
+    pipeline = {}
     p_url = ''
     if pipeline_id:
         # Determine if BDBag (w/ or w/o reports) is present.  Dictates which buttons are enabled/disabled

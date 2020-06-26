@@ -318,32 +318,32 @@ def make_pipeline_report(pipeline):
     # Get extracted data directory path from original BDBag
     extracted_path = report_generator.extract_bag(session.get('bdbag_zip'))
 
-    wrappers_dir = os.path.join(app.config["GENERATORS_DIR"], "wrappers")
+    wrappers_dir = os.path.join(app.config["GENERATORS_DIR"], "scripts")
 
     # Generate additional reports in the extracted bdbag directory
     if 'pipeline_options' in pipeline and not pipeline['pipeline_options'] is None:
         if 'alignment' in pipeline['pipeline_options']:
-            wrapper_script = os.path.join(wrappers_dir, "wrapper_FastQC.R")
-            report_generator.generate_fastqc_report(extracted_path, wrapper_script, outfile_base, pipeline['sample_info'])
+            #wrapper_script = os.path.join(wrappers_dir, "wrapper_FastQC.R")
+            report_generator.generate_fastqc_report(extracted_path, wrappers_dir, outfile_base, pipeline['sample_info'])
             # Alignment reports differ for Proks and Euks
-            wrapper_script = os.path.join(wrappers_dir, "wrapper_Alignment.R")
+            #wrapper_script = os.path.join(wrappers_dir, "wrapper_Alignment.R")
             if pipeline['pipeline_type'] == "Prok":
-                wrapper_script = os.path.join(wrappers_dir, "wrapper_Alignment_prok.R")
-            report_generator.generate_alignment_report(extracted_path, wrapper_script, outfile_base, pipeline['sample_info'])
+                #wrapper_script = os.path.join(wrappers_dir, "wrapper_Alignment_prok.R")
+            report_generator.generate_alignment_report(extracted_path, wrappers_dir, outfile_base, pipeline['sample_info'])
         if 'count' in pipeline['pipeline_options']: # RPKM reports are not generated, only HTSeq count reports
             if pipeline['mapping_file'] is None:
-                wrapper_script = os.path.join(wrappers_dir, "wrapper_GE.R")
-                report_generator.generate_ge_report(extracted_path, wrapper_script, outfile_base, pipeline['sample_info'])
+                #wrapper_script = os.path.join(wrappers_dir, "wrapper_GE.R")
+                report_generator.generate_ge_report(extracted_path, wrappers_dir, outfile_base, pipeline['sample_info'])
             else:
-                wrapper_script = os.path.join(wrappers_dir, "wrapper_GE_mapping.R")
-                report_generator.map_to_GE(extracted_path, wrapper_script, outfile_base, pipeline['sample_info'], pipeline['mapping_file'])
+                #wrapper_script = os.path.join(wrappers_dir, "wrapper_GE_mapping.R")
+                report_generator.map_to_GE(extracted_path, wrappers_dir, outfile_base, pipeline['sample_info'], pipeline['mapping_file'])
         if 'differential_gene_expression' in pipeline['pipeline_options']:
             if pipeline['mapping_file'] is None:
-                wrapper_script = os.path.join(wrappers_dir, "wrapper_DE.R")
-                report_generator.generate_de_report(extracted_path, wrapper_script, outfile_base, pipeline['sample_info'])
+                #wrapper_script = os.path.join(wrappers_dir, "wrapper_DE.R")
+                report_generator.generate_de_report(extracted_path, wrappers_dir, outfile_base, pipeline['sample_info'])
             else:
-                wrapper_script = os.path.join(wrappers_dir, "wrapper_DE_mapping.R")
-                report_generator.map_to_DE(extracted_path, wrapper_script, outfile_base, pipeline['sample_info'], pipeline['mapping_file'])
+                #wrapper_script = os.path.join(wrappers_dir, "wrapper_DE_mapping.R")
+                report_generator.map_to_DE(extracted_path, wrappers_dir, outfile_base, pipeline['sample_info'], pipeline['mapping_file'])
     else:
         # If 'pipeline options' is blank, just run all the commands
         report_generator.generate_all_reports(extracted_path, wrappers_dir, outfile_base, pipeline['sample_info'])
