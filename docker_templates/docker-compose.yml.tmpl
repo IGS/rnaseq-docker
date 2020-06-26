@@ -45,6 +45,7 @@ services:
   grotto:
     environment:
       - DOCKER_HOST=###IP_HOST###
+      - PERL5LIB=/opt/ergatis/lib/perl5
     image: adkinsrs/grotto:devel
     networks:
       - ergatis
