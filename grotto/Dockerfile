@@ -23,17 +23,26 @@ RUN apt -q update && apt -q install -y --no-install-recommends \
   python3-requests \
   python3-urllib3 \
   python3-certifi \
+  # Perl modules
+  cpanminus \
   libxml-writer-perl \
+  libxml-twig-perl \
+  libtimedate-perl \
+  libconfig-inifiles-perl \
+  # Misc things
   git \
   vim \
   wget \
+  file \
   # Report generator dependencies
   imagemagick \
   tesseract-ocr \
   zip unzip \
   && apt-get -q clean autoclean \
   && apt-get -q autoremove -y \
-  && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/* \
+	&& cpanm --force \
+	Log::Cabin
 
 
 WORKDIR /usr/src
@@ -76,6 +85,8 @@ RUN git clone $REPORT_DOWNLOAD_URL \
 
 # Add Ergatis package-rnaseq repo so that volumes don't have to be shared
 COPY --from=adkinsrs/rnaseq:latest /opt/ergatis/ /opt/ergatis/
+COPY --from=adkinsrs/rnaseq:latest /var/www/html/ergatis/cgi/ergatis.ini /tmp/ergatis.ini
+COPY --from=adkinsrs/rnaseq:latest /opt/workflow/ /opt/workflow
 
 COPY . /app
 WORKDIR /app

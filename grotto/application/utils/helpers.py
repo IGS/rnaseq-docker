@@ -286,9 +286,9 @@ def handle_create_pipeline_subprocess(proc):
 
             # If there is any error, then return to 'submit' page
             if not pipeline_id:
-                error = "Could not find pipeline ID for launched pipeline. Please notify the system administrator."
+                error = "Could not find pipeline ID for launched pipeline. Please notify the system administrator.\n Error: " + error
         else:
-            error = "Something went wrong, but no error has been reported. Please notify the system administrator."
+            error = "Something went wrong, but no error has been reported. Please notify the system administrator.\n Error: " + error
     else:
         error = "Something went wrong while submitting the pipeline: Error: " + error
 
