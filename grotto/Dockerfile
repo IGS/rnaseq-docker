@@ -18,11 +18,6 @@ RUN apt -q update && apt -q install -y --no-install-recommends \
   libkrb5-dev \
   python3-dev \
   python3-pip \
-  python3-setuptools \
-  python3-dateutil \
-  python3-requests \
-  python3-urllib3 \
-  python3-certifi \
   # Perl modules
   cpanminus \
   libxml-writer-perl \
@@ -35,6 +30,19 @@ RUN apt -q update && apt -q install -y --no-install-recommends \
   wget \
   file \
   # Report generator dependencies
+  libssl-dev \
+  libxml2-dev \
+  libudunits2-dev \
+  libpng-dev \
+  libmagick++-dev \
+  libcurl4-openssl-dev \
+  libfontconfig1-dev \
+  libavfilter-dev \
+  librsvg2-dev \
+  libwebp-dev \
+  libmariadbclient-dev \
+  cargo \
+  pandoc \
   imagemagick \
   tesseract-ocr \
   zip unzip \
@@ -60,19 +68,10 @@ RUN wget https://cdn.rstudio.com/r/${OS_IDENTIFIER}/pkgs/r-${R_VERSION}_1_amd64.
 COPY install_r_pkgs.sh /tmp/.
 RUN /tmp/install_r_pkgs.sh
 
-# Get R packages and pandoc
-#COPY --from=build /usr/lib/R /usr/lib/R
-COPY --from=pandoc/latex /usr/bin/pandoc /usr/bin/pandoc
-#COPY --from=pandoc/latex /usr/share/pandoc /usr/share/pandoc
-#COPY --from=build /usr/lib/libgmp.so.10 /usr/lib/libgmp.so.10
-#COPY --from=build /usr/lib/libicudata.so.60 /usr/lib/libicudata.so.60
-#COPY --from=build /usr/lib/libreadline.so.8 /usr/lib/libreadline.so.8
-#COPY --from=build /usr/lib/libicuuc.so.60.2 /usr/lib/libicuuc.so.60
-#COPY --from=build /usr/lib/libicui18n.so.60.2 /usr/lib/libicui18n.so.60
-#COPY --from=build /usr/lib/R/library/Rcpp/libs/Rcpp.so /usr/lib/R/library/Rcpp/libs/Rcpp.so
-
+# pip installs
+COPY requirements.txt /tmp/requirements.txt
 RUN pip3 install --upgrade pip \
-  && pip3 install --no-cache-dir bagit bdbag python-dotenv tzlocal flask flask_login flask_session pandas kerberos rpy2
+  && pip3 install --no-cache-dir -r /tmp/requirements.txt
 
 # Install Report generator
 RUN git clone $REPORT_DOWNLOAD_URL \
