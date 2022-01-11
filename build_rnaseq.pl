@@ -11,7 +11,7 @@ die "Need to provide argument for install path: $!\n" if (scalar @ARGV < 1);
 
 my $branch_name='rnaseq';
 my $install_base=$ARGV[0];
-my $ergatis_git_export_path='https://github.com/adkinsrs/ergatis-pipelines.git';	# This uses Git currently.  Others use SVN.
+my $ergatis_git_export_path='https://github.com/IGS/rnaseq-pipeline.git';	# This uses Git currently.  Others use SVN.
 
 ## this directory will be created.  If it exists already, it and everything under it
 #   will be removed
