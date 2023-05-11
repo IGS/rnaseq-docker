@@ -1,5 +1,8 @@
 # CHANGELOG
 
+#v2.2
+* Bump flask from 1.1.2 to 2.2.5 in /grotto (via @dependabot). This was done due to a high security vulnerability in Flask v1
+
 #v2.1
 * Removing code that was for internal use only.  This code only supports the Docker-based builds
 * Moving this codebase from SVN to Github
